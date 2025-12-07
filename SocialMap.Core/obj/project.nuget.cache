@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "8/PJkiQ4lZU=",
+  "success": true,
+  "projectFilePath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/selimbedirhanozturk/.nuget/packages/microsoft.netcore.app.ref/9.0.11/microsoft.netcore.app.ref.9.0.11.nupkg.sha512",
+    "/Users/selimbedirhanozturk/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.11/microsoft.aspnetcore.app.ref.9.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}

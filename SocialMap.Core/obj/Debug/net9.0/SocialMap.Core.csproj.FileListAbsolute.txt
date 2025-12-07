@@ -1,0 +1,11 @@
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/bin/Debug/net9.0/SocialMap.Core.deps.json
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/bin/Debug/net9.0/SocialMap.Core.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/bin/Debug/net9.0/SocialMap.Core.pdb
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.AssemblyInfoInputs.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.AssemblyInfo.cs
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.csproj.CoreCompileInputs.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/refint/SocialMap.Core.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/SocialMap.Core.pdb
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/Debug/net9.0/ref/SocialMap.Core.dll

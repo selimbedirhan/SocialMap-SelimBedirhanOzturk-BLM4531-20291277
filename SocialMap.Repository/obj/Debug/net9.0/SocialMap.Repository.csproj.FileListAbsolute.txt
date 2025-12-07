@@ -1,0 +1,17 @@
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Repository.deps.json
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Repository.runtimeconfig.json
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Repository.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Repository.pdb
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Core.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/bin/Debug/net9.0/SocialMap.Core.pdb
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.csproj.AssemblyReference.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.GeneratedMSBuildEditorConfig.editorconfig
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.AssemblyInfoInputs.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.AssemblyInfo.cs
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.csproj.CoreCompileInputs.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMa.27168D02.Up2Date
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/refint/SocialMap.Repository.dll
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.pdb
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/SocialMap.Repository.genruntimeconfig.cache
+/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/Debug/net9.0/ref/SocialMap.Repository.dll

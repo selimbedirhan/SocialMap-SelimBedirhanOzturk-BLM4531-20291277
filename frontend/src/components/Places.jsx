@@ -1,0 +1,327 @@
+import { useState, useEffect } from 'react';
+import { api } from '../services/api';
+import PostDetailModal from './PostDetailModal';
+
+export default function Places() {
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    city: '',
+    country: 'Türkiye',
+    district: '',
+    latitude: '',
+    longitude: '',
+    description: '',
+    tags: '',
+    createdById: '',
+  });
+  const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedPlacePosts, setSelectedPlacePosts] = useState([]);
+  const [loadingPlacePosts, setLoadingPlacePosts] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  useEffect(() => {
+    loadPlaces();
+    loadUsers();
+    // LocalStorage'dan kullanıcı bilgisini al
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        setFormData(prev => ({ ...prev, createdById: user.id }));
+      } catch (err) {
+        console.error('Kullanıcı bilgisi yüklenemedi:', err);
+      }
+    }
+  }, []);
+
+  const loadPlaces = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getPlaces();
+      setPlaces(data);
+      setError(null);
+    } catch (err) {
+      setError('Yerler yüklenirken hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      const data = await api.getUsers();
+      setUsers(data);
+    } catch (err) {
+      console.error('Kullanıcılar yüklenemedi:', err);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      loadPlaces();
+      return;
+    }
+    try {
+      setLoading(true);
+      const data = await api.searchPlaces(searchTerm);
+      setPlaces(data);
+    } catch (err) {
+      setError('Arama yapılırken hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.createPlace({
+        name: formData.name,
+        city: formData.city,
+        country: formData.country || 'Türkiye',
+        district: formData.district || null,
+        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        description: formData.description || null,
+        tags: formData.tags || null,
+        createdById: formData.createdById || currentUser?.id,
+      });
+      setShowForm(false);
+      setFormData({
+        name: '',
+        city: '',
+        country: 'Türkiye',
+        district: '',
+        latitude: '',
+        longitude: '',
+        description: '',
+        tags: '',
+        createdById: currentUser?.id || '',
+      });
+      loadPlaces();
+    } catch (err) {
+      setError('Yer oluşturulurken hata oluştu.');
+    }
+  };
+
+  const handlePlaceClick = async (place) => {
+    setSelectedPlace(place);
+    setLoadingPlacePosts(true);
+    try {
+      const posts = await api.getPostsByPlace(place.id);
+      setSelectedPlacePosts(posts || []);
+    } catch (err) {
+      console.error('Yer gönderileri yüklenemedi:', err);
+    } finally {
+      setLoadingPlacePosts(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Yükleniyor...</div>;
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2>Yerler</h2>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'İptal' : 'Yeni Yer'}
+        </button>
+      </div>
+
+      {error && <div className="error">{error}</div>}
+
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <input
+          type="text"
+          placeholder="Yer ara..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+        />
+        <button className="btn btn-secondary" onClick={handleSearch}>Ara</button>
+      </div>
+
+      {showForm && (
+        <form className="form" onSubmit={handleSubmit} style={{ marginBottom: '30px' }}>
+          <div className="form-group">
+            <label>Yer Adı</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Şehir</label>
+            <input
+              type="text"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Ülke</label>
+            <input
+              type="text"
+              value={formData.country || 'Türkiye'}
+              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+              placeholder="Türkiye"
+            />
+          </div>
+          <div className="form-group">
+            <label>İlçe (Opsiyonel)</label>
+            <input
+              type="text"
+              value={formData.district}
+              onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div className="form-group">
+              <label>Enlem (Opsiyonel)</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.latitude}
+                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Boylam (Opsiyonel)</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.longitude}
+                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Açıklama (Opsiyonel)</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>Etiketler (Opsiyonel, virgülle ayırın)</label>
+            <input
+              type="text"
+              value={formData.tags}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              placeholder="doğa, tarih, kültür"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Oluştur</button>
+        </form>
+      )}
+
+      <div className="places-list">
+        {places.map((place) => (
+          <div
+            key={place.id}
+            className="place-card"
+            style={{ cursor: 'pointer' }}
+            onClick={() => handlePlaceClick(place)}
+          >
+            <div className="place-name">{place.name}</div>
+            <div className="place-location">
+              {place.city} {place.district && `- ${place.district}`} - {place.country || 'Türkiye'}
+            </div>
+            {place.description && (
+              <div className="place-description">{place.description}</div>
+            )}
+            {place.tags && (
+              <div style={{ marginTop: '10px', fontSize: '12px', color: '#3498db' }}>
+                {place.tags.split(',').map((tag, i) => (
+                  <span key={i} style={{ marginRight: '5px' }}>#{tag.trim()}</span>
+                ))}
+              </div>
+            )}
+            <div style={{ marginTop: '10px', fontSize: '12px', color: '#7f8c8d' }}>
+              Oluşturan: {place.createdByUsername} • {place.postsCount} gönderi
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedPlace && (
+        <div style={{ marginTop: '30px' }}>
+          <h3>
+            {selectedPlace.name} - {selectedPlace.city}{' '}
+            <span style={{ fontSize: '14px', color: '#7f8c8d' }}>
+              ({selectedPlace.postsCount} gönderi)
+            </span>
+          </h3>
+          {selectedPlace.description && (
+            <p style={{ marginTop: '10px', color: '#555' }}>{selectedPlace.description}</p>
+          )}
+
+          {loadingPlacePosts ? (
+            <div className="loading">Gönderiler yükleniyor...</div>
+          ) : selectedPlacePosts.length === 0 ? (
+            <div style={{ padding: '20px', color: '#7f8c8d' }}>Bu yerde henüz gönderi yok.</div>
+          ) : (
+            <div className="posts-grid" style={{ marginTop: '15px' }}>
+              {selectedPlacePosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="post-card"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedPost(post)}
+                >
+                  {post.mediaUrl && (
+                    <img
+                      src={`http://localhost:5280${post.mediaUrl}`}
+                      alt={post.caption}
+                      className="post-image"
+                    />
+                  )}
+                  {post.caption && <div className="post-caption">{post.caption}</div>}
+                  <div className="post-stats">
+                    ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {selectedPost && (
+        <PostDetailModal
+          post={selectedPost}
+          user={currentUser}
+          onClose={() => setSelectedPost(null)}
+          onUserClick={(userId) => {
+            // App.jsx'e navigate etmek için window.location veya parent'a prop geçmek gerekir
+            // Şimdilik basit bir çözüm
+            window.location.hash = `profile-${userId}`;
+          }}
+          onLike={async (postId, isLiked) => {
+            setSelectedPlacePosts(prev =>
+              prev.map(p =>
+                p.id === postId
+                  ? { ...p, likesCount: isLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1) }
+                  : p
+              )
+            );
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
