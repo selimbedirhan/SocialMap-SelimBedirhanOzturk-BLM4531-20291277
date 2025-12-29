@@ -80,34 +80,7 @@ public class SearchController : ControllerBase
         [FromQuery] DateTime? toDate = null,
         [FromQuery] string? sortBy = "newest")
     {
-        var posts = await _postService.GetRecentPostsAsync(1000);
-
-        if (!string.IsNullOrWhiteSpace(term))
-        {
-            posts = posts.Where(p =>
-                (p.Caption != null && p.Caption.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
-                (p.Place?.Name != null && p.Place.Name.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
-                (p.Place?.City != null && p.Place.City.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
-                (p.Place?.Country != null && p.Place.Country.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
-                (p.Place?.District != null && p.Place.District.Contains(term, StringComparison.OrdinalIgnoreCase))
-            );
-        }
-
-        if (!string.IsNullOrWhiteSpace(city))
-        {
-            posts = posts.Where(p => p.Place?.City != null && 
-                p.Place.City.Contains(city, StringComparison.OrdinalIgnoreCase));
-        }
-
-        if (fromDate.HasValue)
-        {
-            posts = posts.Where(p => p.CreatedAt >= fromDate.Value);
-        }
-
-        if (toDate.HasValue)
-        {
-            posts = posts.Where(p => p.CreatedAt <= toDate.Value);
-        }
+        var posts = await _postService.SearchPostsAsync(term, city, fromDate, toDate);
 
         // Sıralama
         var postsList = posts.ToList();

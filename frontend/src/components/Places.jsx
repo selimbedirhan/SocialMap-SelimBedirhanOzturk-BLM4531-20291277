@@ -26,6 +26,9 @@ export default function Places() {
   const [loadingPlacePosts, setLoadingPlacePosts] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  const [postResults, setPostResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+
   useEffect(() => {
     loadPlaces();
     loadUsers();
@@ -67,14 +70,25 @@ export default function Places() {
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       loadPlaces();
+      setPostResults([]);
       return;
     }
+
     try {
       setLoading(true);
-      const data = await api.searchPlaces(searchTerm);
-      setPlaces(data);
+      setSearching(true);
+
+      // Paralel aramalar
+      const [placesData, postsData] = await Promise.all([
+        api.searchPlaces(searchTerm),
+        api.searchPosts({ term: searchTerm })
+      ]);
+
+      setPlaces(placesData);
+      setPostResults(postsData);
     } catch (err) {
       setError('Arama yapılırken hata oluştu.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -125,34 +139,36 @@ export default function Places() {
     }
   };
 
-  if (loading) {
+  if (loading && !places.length && !postResults.length) {
     return <div className="loading">Yükleniyor...</div>;
   }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>Yerler</h2>
+        <h2>Yerler & Keşfet</h2>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'İptal' : 'Yeni Yer'}
+          {showForm ? 'İptal' : 'Yeni Yer Ekle'}
         </button>
       </div>
 
       {error && <div className="error">{error}</div>}
 
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div style={{ marginBottom: '30px', display: 'flex', gap: '10px' }}>
         <input
           type="text"
-          placeholder="Yer ara..."
+          placeholder="Şehir, mekan veya konu ara (örn: Ankara, Starbucks, Kahve)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          style={{ flex: 1, padding: '15px', border: '1px solid var(--border-color)', borderRadius: '15px', fontSize: '16px', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)' }}
         />
-        <button className="btn btn-secondary" onClick={handleSearch}>Ara</button>
+        <button className="btn btn-primary" onClick={handleSearch} style={{ padding: '0 30px' }}>Ara</button>
       </div>
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit} style={{ marginBottom: '30px' }}>
+          {/* Form Content kept same as before but encapsulated for brevity in edit if not changed, but here we replace all so included everything */}
           <div className="form-group">
             <label>Yer Adı</label>
             <input
@@ -228,33 +244,74 @@ export default function Places() {
         </form>
       )}
 
-      <div className="places-list">
-        {places.map((place) => (
-          <div
-            key={place.id}
-            className="place-card"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handlePlaceClick(place)}
-          >
-            <div className="place-name">{place.name}</div>
-            <div className="place-location">
-              {place.city} {place.district && `- ${place.district}`} - {place.country || 'Türkiye'}
-            </div>
-            {place.description && (
-              <div className="place-description">{place.description}</div>
-            )}
-            {place.tags && (
-              <div style={{ marginTop: '10px', fontSize: '12px', color: '#3498db' }}>
-                {place.tags.split(',').map((tag, i) => (
-                  <span key={i} style={{ marginRight: '5px' }}>#{tag.trim()}</span>
-                ))}
+      {/* Post Results Section - Only show when searching */}
+      {searching && postResults.length > 0 && (
+        <div style={{ marginBottom: '40px' }}>
+          <h3 style={{ marginBottom: '15px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+            Bulunan Gönderiler ({postResults.length})
+          </h3>
+          <div className="posts-grid">
+            {postResults.map((post) => (
+              <div
+                key={post.id}
+                className="post-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedPost(post)}
+              >
+                {post.mediaUrl && (
+                  <img
+                    src={`http://localhost:5280${post.mediaUrl}`}
+                    alt={post.caption}
+                    className="post-image"
+                  />
+                )}
+                {post.caption && <div className="post-caption">{post.caption}</div>}
+                <div style={{ fontSize: '12px', color: '#999', margin: '5px 15px' }}>
+                  📍 {post.placeName || post.city || 'Konum Yok'}
+                </div>
+                <div className="post-stats">
+                  ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                </div>
               </div>
-            )}
-            <div style={{ marginTop: '10px', fontSize: '12px', color: '#7f8c8d' }}>
-              Oluşturan: {place.createdByUsername} • {place.postsCount} gönderi
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* Places Results Section */}
+      <div>
+        {searching && <h3 style={{ marginBottom: '15px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+          {places.length > 0 ? `Bulunan Yerler (${places.length})` : 'Bulunan Yer Yok'}
+        </h3>}
+
+        <div className="places-list">
+          {places.map((place) => (
+            <div
+              key={place.id}
+              className="place-card"
+              style={{ cursor: 'pointer' }}
+              onClick={() => handlePlaceClick(place)}
+            >
+              <div className="place-name">{place.name}</div>
+              <div className="place-location">
+                {place.city} {place.district && `- ${place.district}`} - {place.country || 'Türkiye'}
+              </div>
+              {place.description && (
+                <div className="place-description">{place.description}</div>
+              )}
+              {place.tags && (
+                <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--accent-color)' }}>
+                  {place.tags.split(',').map((tag, i) => (
+                    <span key={i} style={{ marginRight: '5px' }}>#{tag.trim()}</span>
+                  ))}
+                </div>
+              )}
+              <div style={{ marginTop: '10px', fontSize: '12px', opacity: 0.7 }}>
+                {place.postsCount ? `${place.postsCount} gönderi` : 'Henüz gönderi yok'}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {selectedPlace && (
@@ -311,13 +368,9 @@ export default function Places() {
             window.location.hash = `profile-${userId}`;
           }}
           onLike={async (postId, isLiked) => {
-            setSelectedPlacePosts(prev =>
-              prev.map(p =>
-                p.id === postId
-                  ? { ...p, likesCount: isLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1) }
-                  : p
-              )
-            );
+            // Hem genel aramadan hem yer detayından güncelle
+            setPostResults(prev => prev.map(p => p.id === postId ? { ...p, likesCount: isLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1) } : p));
+            setSelectedPlacePosts(prev => prev.map(p => p.id === postId ? { ...p, likesCount: isLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1) } : p));
           }}
         />
       )}

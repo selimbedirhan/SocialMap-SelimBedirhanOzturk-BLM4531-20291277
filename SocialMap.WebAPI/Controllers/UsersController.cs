@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Interfaces;
-using System.Security.Cryptography;
-using System.Text;
+using AutoMapper;
 
 namespace SocialMap.WebAPI.Controllers;
 
@@ -11,25 +10,19 @@ namespace SocialMap.WebAPI.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, IMapper mapper)
     {
         _userService = userService;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllUsers()
     {
         var users = await _userService.GetAllUsersAsync();
-        var userDtos = users.Select(u => new UserResponseDto
-        {
-            Id = u.Id,
-            Username = u.Username,
-            Email = u.Email,
-            ProfilePhotoUrl = u.ProfilePhotoUrl,
-            Bio = u.Bio,
-            CreatedAt = u.CreatedAt
-        });
+        var userDtos = _mapper.Map<IEnumerable<UserResponseDto>>(users);
         return Ok(userDtos);
     }
 
@@ -40,15 +33,7 @@ public class UsersController : ControllerBase
         if (user == null)
             return NotFound();
 
-        var userDto = new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            ProfilePhotoUrl = user.ProfilePhotoUrl,
-            Bio = user.Bio,
-            CreatedAt = user.CreatedAt
-        };
+        var userDto = _mapper.Map<UserResponseDto>(user);
         return Ok(userDto);
     }
 
@@ -59,15 +44,7 @@ public class UsersController : ControllerBase
         if (user == null)
             return NotFound();
 
-        var userDto = new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            ProfilePhotoUrl = user.ProfilePhotoUrl,
-            Bio = user.Bio,
-            CreatedAt = user.CreatedAt
-        };
+        var userDto = _mapper.Map<UserResponseDto>(user);
         return Ok(userDto);
     }
 
@@ -76,19 +53,10 @@ public class UsersController : ControllerBase
     {
         try
         {
-            // Basit hash - production'da BCrypt veya Argon2 kullanılmalı
-            var passwordHash = HashPassword(dto.Password);
-            var user = await _userService.CreateUserAsync(dto.Username, dto.Email, passwordHash);
+            // UserService artık hashlemeyi kendi yapıyor
+            var user = await _userService.CreateUserAsync(dto.Username, dto.Email, dto.Password);
 
-            var userDto = new UserResponseDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                ProfilePhotoUrl = user.ProfilePhotoUrl,
-                Bio = user.Bio,
-                CreatedAt = user.CreatedAt
-            };
+            var userDto = _mapper.Map<UserResponseDto>(user);
 
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, userDto);
         }
@@ -139,24 +107,10 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> SearchUsers([FromQuery] string searchTerm)
     {
         var users = await _userService.SearchUsersAsync(searchTerm);
-        var userDtos = users.Select(u => new UserResponseDto
-        {
-            Id = u.Id,
-            Username = u.Username,
-            Email = u.Email,
-            ProfilePhotoUrl = u.ProfilePhotoUrl,
-            Bio = u.Bio,
-            CreatedAt = u.CreatedAt
-        });
+        var userDtos = _mapper.Map<IEnumerable<UserResponseDto>>(users);
         return Ok(userDtos);
     }
 
-    private static string HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = Encoding.UTF8.GetBytes(password);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
-    }
+
 }
 

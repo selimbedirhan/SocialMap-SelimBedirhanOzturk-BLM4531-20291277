@@ -1,5 +1,14 @@
 const API_BASE_URL = 'http://localhost:5280/api';
 
+// JWT Token'ı header'lara eklemek için yardımcı fonksiyon
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
 export const api = {
   // Users
   async getUsers() {
@@ -24,7 +33,7 @@ export const api = {
   async updateUserProfile(userId, userData) {
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(userData),
     });
     if (!response.ok) throw new Error('Failed to update profile');
@@ -68,7 +77,7 @@ export const api = {
   async createPost(postData) {
     const response = await fetch(`${API_BASE_URL}/posts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(postData),
     });
     if (!response.ok) {
@@ -76,6 +85,25 @@ export const api = {
       throw new Error(errorText || 'Gönderi oluşturulamadı');
     }
     return response.json();
+  },
+
+  async updatePost(id, postData) {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(postData),
+    });
+    if (!response.ok) throw new Error('Failed to update post');
+    return response.status === 204;
+  },
+
+  async deletePost(id) {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to delete post');
+    return response.status === 204;
   },
 
   // Places
@@ -116,7 +144,7 @@ export const api = {
   async createPlace(placeData) {
     const response = await fetch(`${API_BASE_URL}/places`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(placeData),
     });
     return response.json();
@@ -142,7 +170,7 @@ export const api = {
   async createComment(commentData) {
     const response = await fetch(`${API_BASE_URL}/comments`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(commentData),
     });
     if (!response.ok) {
@@ -156,6 +184,7 @@ export const api = {
   async addLike(postId, userId) {
     const response = await fetch(`${API_BASE_URL}/likes?postId=${postId}&userId=${userId}`, {
       method: 'POST',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       const errorText = await response.text();
@@ -167,6 +196,7 @@ export const api = {
   async removeLike(postId, userId) {
     const response = await fetch(`${API_BASE_URL}/likes?postId=${postId}&userId=${userId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return response.status === 204;
   },
@@ -190,12 +220,20 @@ export const api = {
     return response.json();
   },
 
+  async getLikesByPost(postId) {
+    const response = await fetch(`${API_BASE_URL}/likes/post/${postId}`);
+    if (!response.ok) throw new Error('Failed to fetch likes');
+    return response.json();
+  },
+
   // File Upload
   async uploadImage(file) {
     const formData = new FormData();
     formData.append('file', file);
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/fileupload/image`, {
       method: 'POST',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       body: formData,
     });
     return response.json();
@@ -205,6 +243,7 @@ export const api = {
   async followUser(followerId, followingId) {
     const response = await fetch(`${API_BASE_URL}/follows/${followerId}/follow/${followingId}`, {
       method: 'POST',
+      headers: getAuthHeaders(),
     });
     return response.json();
   },
@@ -212,6 +251,7 @@ export const api = {
   async unfollowUser(followerId, followingId) {
     const response = await fetch(`${API_BASE_URL}/follows/${followerId}/unfollow/${followingId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return response.status === 204;
   },
@@ -291,7 +331,7 @@ export const api = {
     if (filters.fromDate) params.append('fromDate', filters.fromDate);
     if (filters.toDate) params.append('toDate', filters.toDate);
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
-    
+
     const response = await fetch(`${API_BASE_URL}/search/posts?${params}`);
     return response.json();
   },

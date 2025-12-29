@@ -7,11 +7,13 @@ public class PlaceService : IPlaceService
 {
     private readonly IPlaceRepository _placeRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ICacheService _cacheService;
 
-    public PlaceService(IPlaceRepository placeRepository, IUserRepository userRepository)
+    public PlaceService(IPlaceRepository placeRepository, IUserRepository userRepository, ICacheService cacheService)
     {
         _placeRepository = placeRepository;
         _userRepository = userRepository;
+        _cacheService = cacheService;
     }
 
     public async Task<Place?> GetPlaceByIdAsync(Guid id)
@@ -21,7 +23,18 @@ public class PlaceService : IPlaceService
 
     public async Task<IEnumerable<Place>> GetAllPlacesAsync()
     {
-        return await _placeRepository.GetAllAsync();
+        string cacheKey = "all_places";
+        var cachedPlaces = await _cacheService.GetAsync<IEnumerable<Place>>(cacheKey);
+
+        if (cachedPlaces != null)
+        {
+            return cachedPlaces;
+        }
+
+        var places = await _placeRepository.GetAllAsync();
+        await _cacheService.SetAsync(cacheKey, places, TimeSpan.FromHours(1));
+
+        return places;
     }
 
     public async Task<IEnumerable<Place>> GetPlacesByCityAsync(string city)
@@ -65,7 +78,10 @@ public class PlaceService : IPlaceService
             CreatedAt = DateTime.UtcNow
         };
 
-        return await _placeRepository.AddAsync(place);
+        var addedPlace = await _placeRepository.AddAsync(place);
+        await _cacheService.RemoveAsync("all_places");
+
+        return addedPlace;
     }
 
     public async Task UpdatePlaceAsync(Place place)
@@ -75,6 +91,7 @@ public class PlaceService : IPlaceService
             throw new InvalidOperationException($"Place with ID '{place.Id}' not found.");
 
         await _placeRepository.UpdateAsync(place);
+        await _cacheService.RemoveAsync("all_places");
     }
 
     public async Task DeletePlaceAsync(Guid id)
@@ -84,6 +101,7 @@ public class PlaceService : IPlaceService
             throw new InvalidOperationException($"Place with ID '{id}' not found.");
 
         await _placeRepository.DeleteAsync(place);
+        await _cacheService.RemoveAsync("all_places");
     }
 }
 

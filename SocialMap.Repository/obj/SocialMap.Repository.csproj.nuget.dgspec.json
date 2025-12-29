@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {}
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {}
   },
   "projects": {
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
         "projectName": "SocialMap.Core",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -73,14 +73,14 @@
         }
       }
     },
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
         "projectName": "SocialMap.Repository",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -95,8 +95,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
               }
             }
           }

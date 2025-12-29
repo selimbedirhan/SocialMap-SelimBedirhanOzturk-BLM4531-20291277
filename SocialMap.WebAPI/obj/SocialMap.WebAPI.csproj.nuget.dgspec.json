@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj": {}
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj": {}
   },
   "projects": {
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/SocialMap.Business.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/SocialMap.Business.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/SocialMap.Business.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/SocialMap.Business.csproj",
         "projectName": "SocialMap.Business",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/SocialMap.Business.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/SocialMap.Business.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -26,11 +26,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
               },
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj"
               }
             }
           }
@@ -50,6 +50,28 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[12.1.1, )"
+            },
+            "FluentValidation.DependencyInjectionExtensions": {
+              "target": "Package",
+              "version": "[12.1.1, )"
+            },
+            "MediatR": {
+              "target": "Package",
+              "version": "[14.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -80,14 +102,14 @@
         }
       }
     },
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
         "projectName": "SocialMap.Core",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -149,14 +171,14 @@
         }
       }
     },
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
         "projectName": "SocialMap.Repository",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/SocialMap.Repository.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Repository/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Repository/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -171,8 +193,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
               }
             }
           }
@@ -238,14 +260,14 @@
         }
       }
     },
-    "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj": {
+    "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj",
+        "projectUniqueName": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj",
         "projectName": "SocialMap.WebAPI",
-        "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj",
+        "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj",
         "packagesPath": "/Users/selimbedirhanozturk/.nuget/packages/",
-        "outputPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.WebAPI/obj/",
+        "outputPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/selimbedirhanozturk/.nuget/NuGet/NuGet.Config"
@@ -260,11 +282,11 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/SocialMap.Business.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Business/SocialMap.Business.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/SocialMap.Business.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Business/SocialMap.Business.csproj"
               },
-              "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
-                "projectPath": "/Users/selimbedirhanozturk/Desktop/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
+              "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj": {
+                "projectPath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Core/SocialMap.Core.csproj"
               }
             }
           }
@@ -285,9 +307,25 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+            "AspNetCore.HealthChecks.NpgSql": {
               "target": "Package",
               "version": "[9.0.0, )"
+            },
+            "AspNetCoreRateLimit": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.1, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[10.0.1, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
@@ -300,6 +338,18 @@
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[9.0.2, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[10.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.1.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

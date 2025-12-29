@@ -8,6 +8,7 @@ import Notifications from './components/Notifications';
 import Search from './components/Search';
 import MapView from './components/MapView';
 import Places from './components/Places';
+import GlassToast from './components/GlassToast';
 import { api } from './services/api';
 import { getConnection, disconnect } from './services/signalr';
 
@@ -16,6 +17,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  // State için GlassToast
+  const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
     // LocalStorage'dan kullanıcı bilgisini yükle
@@ -29,6 +32,32 @@ function App() {
     }
   }, []);
 
+  // Toast Ekleme Fonksiyonu
+  const addToast = (notification) => {
+    const id = Date.now();
+    const type = notification.type;
+    let icon = '🔔';
+    let title = 'Yeni Bildirim';
+
+    if (type === 'like') { icon = '❤️'; title = 'Beğeni'; }
+    else if (type === 'comment') { icon = '💬'; title = 'Yorum'; }
+    else if (type === 'follow') { icon = '👤'; title = 'Yeni Takipçi'; }
+
+    const newToast = {
+      id,
+      title,
+      message: notification.message,
+      icon,
+      type: 'info' // veya success, error vs.
+    };
+
+    setToasts(prev => [...prev, newToast]);
+  };
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
   useEffect(() => {
     if (user?.id) {
       loadUnreadCount();
@@ -38,25 +67,20 @@ function App() {
 
       // SignalR bağlantısını kur
       const connection = getConnection(user.id);
-      
-      // Bildirim dinleyicisi - sadece sayıyı güncelle, liste güncellemesi Notifications component'inde yapılacak
+
+      // Bildirim dinleyicisi
       const handleNotification = (notification) => {
-        console.log('Yeni bildirim:', notification);
-        // Bildirim sayısını güncelle
+        console.log('Yeni bildirim (App):', notification);
         loadUnreadCount();
+        addToast(notification); // Toast göster
       };
-      
+
       connection.on('ReceiveNotification', handleNotification);
 
       return () => {
         clearInterval(interval);
         connection.off('ReceiveNotification', handleNotification);
-        // SignalR bağlantısını kapatma - Notifications component'inde kullanılıyor
-      };
-
-      return () => {
-        clearInterval(interval);
-        // SignalR bağlantısını kapatma - Notifications component'inde kullanılıyor
+        // disconnect(); // Bağlantıyı kapatmıyoruz, Notifications.jsx veya diğerleri kullanabilir
       };
     } else {
       disconnect();
@@ -83,6 +107,7 @@ function App() {
     localStorage.removeItem('user');
     setUser(null);
     setActiveTab('home');
+    disconnect(); // Çıkış yapınca bağlantıyı kopar
   };
 
   const handleUserClick = (userId) => {
@@ -94,6 +119,7 @@ function App() {
   if (!user) {
     return (
       <div className="app">
+        <GlassToast toasts={toasts} removeToast={removeToast} />
         <div className="header">
           <h1>SocialMap</h1>
           <p>Yerlerinizi keşfedin, paylaşın ve keşfedin</p>
@@ -107,6 +133,7 @@ function App() {
 
   return (
     <div className="app">
+      <GlassToast toasts={toasts} removeToast={removeToast} />
       <div className="header">
         <h1>SocialMap</h1>
         <p>Yerlerinizi keşfedin, paylaşın ve keşfedin</p>
@@ -116,12 +143,6 @@ function App() {
             onClick={() => { setActiveTab('home'); setSelectedUserId(null); }}
           >
             🏠 Anasayfa
-          </button>
-          <button
-            className={activeTab === 'search' ? 'active' : ''}
-            onClick={() => { setActiveTab('search'); setSelectedUserId(null); }}
-          >
-            🔍 Arama
           </button>
           <button
             className={activeTab === 'places' ? 'active' : ''}

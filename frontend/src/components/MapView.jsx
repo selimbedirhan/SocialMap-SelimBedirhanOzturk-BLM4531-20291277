@@ -17,7 +17,7 @@ L.Icon.Default.mergeOptions({
 function createClusterIcon(count, isCluster) {
   const size = isCluster ? Math.min(50, 30 + count * 2) : 30;
   const color = isCluster ? '#e74c3c' : '#3498db';
-  
+
   return L.divIcon({
     className: 'custom-cluster-icon',
     html: `<div style="
@@ -45,7 +45,7 @@ function MapClustersLayer({ clusters, onClusterClick, currentZoom }) {
       {clusters.map((cluster, index) => {
         const isCluster = cluster.isCluster !== false && cluster.postsCount > 1;
         const icon = createClusterIcon(cluster.postsCount, isCluster);
-        
+
         return (
           <Marker
             key={cluster.placeId ?? `cluster-${cluster.latitude}-${cluster.longitude}-${index}`}
@@ -88,13 +88,13 @@ function MapEventHandler({ onBoundsChange, onZoomChange }) {
     const updateBounds = () => {
       const bounds = map.getBounds();
       const zoom = map.getZoom();
-      
+
       // Zoom değiştiyse callback'i çağır
       if (zoom !== lastZoomRef.current) {
         lastZoomRef.current = zoom;
         onZoomChange?.(zoom);
       }
-      
+
       onBoundsChange({
         north: bounds.getNorth(),
         south: bounds.getSouth(),
@@ -178,21 +178,33 @@ export default function MapView({ user, onUserClick }) {
   const handleClusterClick = async (cluster) => {
     setSelectedCluster(cluster);
     setLoadingPosts(true);
-    
+
     try {
       // Eğer samplePostIds varsa, o postları yükle
+      let posts = [];
       if (cluster.samplePostIds && cluster.samplePostIds.length > 0) {
-        const posts = await Promise.all(
+        const fetchedPosts = await Promise.all(
           cluster.samplePostIds.map(id => api.getPostById(id))
         );
-        setSelectedClusterPosts(posts.filter(p => p != null));
-      } 
+        posts = fetchedPosts.filter(p => p != null);
+        setSelectedClusterPosts(posts);
+      }
       // Eğer placeId varsa, o yerin tüm gönderilerini yükle
       else if (cluster.placeId) {
-        const posts = await api.getPostsByPlace(cluster.placeId);
+        posts = await api.getPostsByPlace(cluster.placeId);
         setSelectedClusterPosts(posts || []);
       } else {
         setSelectedClusterPosts([]);
+      }
+
+      // UX İyileştirmesi: Eğer tek bir gönderi varsa direkt modali aç
+      if (posts && posts.length === 1) {
+        setSelectedPost(posts[0]);
+      } else if (posts && posts.length > 1) {
+        // Birden fazla varsa listeye kaydır
+        setTimeout(() => {
+          document.getElementById('cluster-posts-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       }
     } catch (err) {
       console.error('Gönderiler yüklenemedi:', err);
@@ -218,7 +230,7 @@ export default function MapView({ user, onUserClick }) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <MapEventHandler 
+          <MapEventHandler
             onBoundsChange={handleBoundsChange}
             onZoomChange={handleZoomChange}
           />
@@ -246,8 +258,8 @@ export default function MapView({ user, onUserClick }) {
             </Marker>
           )}
           {!loading && (
-            <MapClustersLayer 
-              clusters={clusters} 
+            <MapClustersLayer
+              clusters={clusters}
               onClusterClick={handleClusterClick}
               currentZoom={currentZoom}
             />
@@ -260,44 +272,72 @@ export default function MapView({ user, onUserClick }) {
         </div>
       )}
       {selectedCluster && (
-        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-          <h3>
-            {selectedCluster.placeName || 'Bölge'} 
-            {selectedCluster.city && ` - ${selectedCluster.city}`}
-            {' '}
-            <span style={{ fontSize: '14px', color: '#7f8c8d' }}>
-              ({selectedCluster.postsCount} {selectedCluster.postsCount === 1 ? 'gönderi' : 'gönderi'})
-            </span>
-          </h3>
-          {loadingPosts ? (
-            <div className="loading">Gönderiler yükleniyor...</div>
-          ) : selectedClusterPosts.length === 0 ? (
-            <div style={{ padding: '20px', color: '#7f8c8d' }}>Bu yerde henüz gönderi yok.</div>
-          ) : (
-            <div className="posts-grid" style={{ marginTop: '15px' }}>
-              {selectedClusterPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="post-card"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedPost(post)}
-                >
-                  {post.mediaUrl && (
-                    <img
-                      src={`http://localhost:5280${post.mediaUrl}`}
-                      alt={post.caption}
-                      className="post-image"
-                    />
-                  )}
-                  {post.caption && <div className="post-caption">{post.caption}</div>}
-                  <div className="post-stats">
-                    ❤️ {post.likesCount} • 💬 {post.commentsCount}
+        <>
+          <style>
+            {`
+              @keyframes fadeSlideUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+            `}
+          </style>
+          <div
+            id="cluster-posts-section"
+            style={{
+              marginTop: '20px',
+              padding: '20px',
+              backgroundColor: '#1e1e1e',
+              borderRadius: '12px',
+              border: '1px solid #333',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+              color: '#ecf0f1',
+              animation: 'fadeSlideUp 0.4s ease-out',
+              minHeight: '200px'
+            }}
+          >
+            <h3 style={{ borderBottom: '1px solid #333', paddingBottom: '10px', marginBottom: '15px' }}>
+              {selectedCluster.placeName || 'Bölge'}
+              {selectedCluster.city && ` - ${selectedCluster.city}`}
+              {' '}
+              <span style={{ fontSize: '14px', color: '#bdc3c7', fontWeight: 'normal' }}>
+                ({selectedCluster.postsCount} {selectedCluster.postsCount === 1 ? 'gönderi' : 'gönderi'})
+              </span>
+            </h3>
+            {loadingPosts ? (
+              <div className="loading" style={{ color: '#bdc3c7' }}>Gönderiler yükleniyor...</div>
+            ) : selectedClusterPosts.length === 0 ? (
+              <div style={{ padding: '20px', color: '#95a5a6', textAlign: 'center' }}>Bu yerde henüz gönderi yok.</div>
+            ) : (
+              <div className="posts-grid" style={{ marginTop: '15px' }}>
+                {selectedClusterPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="post-card"
+                    style={{
+                      cursor: 'pointer',
+                      backgroundColor: '#2d3436',
+                      border: '1px solid #444',
+                      color: '#fff'
+                    }}
+                    onClick={() => setSelectedPost(post)}
+                  >
+                    {post.mediaUrl && (
+                      <img
+                        src={`http://localhost:5280${post.mediaUrl}`}
+                        alt={post.caption}
+                        className="post-image"
+                      />
+                    )}
+                    {post.caption && <div className="post-caption" style={{ color: '#dfe6e9' }}>{post.caption}</div>}
+                    <div className="post-stats" style={{ color: '#b2bec3' }}>
+                      ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {selectedPost && (

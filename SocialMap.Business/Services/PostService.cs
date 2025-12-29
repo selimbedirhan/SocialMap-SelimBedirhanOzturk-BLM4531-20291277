@@ -11,14 +11,22 @@ public class PostService : IPostService
     private readonly IPlaceRepository _placeRepository;
     private readonly IFollowRepository _followRepository;
     private readonly INotificationService _notificationService;
+    private readonly ICacheService _cacheService;
 
-    public PostService(IPostRepository postRepository, IUserRepository userRepository, IPlaceRepository placeRepository, IFollowRepository followRepository, INotificationService notificationService)
+    public PostService(
+        IPostRepository postRepository, 
+        IUserRepository userRepository, 
+        IPlaceRepository placeRepository, 
+        IFollowRepository followRepository, 
+        INotificationService notificationService,
+        ICacheService cacheService)
     {
         _postRepository = postRepository;
         _userRepository = userRepository;
         _placeRepository = placeRepository;
         _followRepository = followRepository;
         _notificationService = notificationService;
+        _cacheService = cacheService;
     }
 
     public async Task<Post?> GetPostByIdAsync(Guid id)
@@ -38,7 +46,34 @@ public class PostService : IPostService
 
     public async Task<IEnumerable<Post>> GetRecentPostsAsync(int count = 20)
     {
-        return await _postRepository.GetRecentPostsAsync(count);
+        string cacheKey = $"recent_posts_{count}";
+        var cachedPosts = await _cacheService.GetAsync<IEnumerable<Post>>(cacheKey);
+        
+        if (cachedPosts != null)
+        {
+            return cachedPosts;
+        }
+
+        var posts = await _postRepository.GetRecentPostsAsync(count);
+        await _cacheService.SetAsync(cacheKey, posts, TimeSpan.FromMinutes(10));
+        
+        return posts;
+    }
+
+    public async Task<(IEnumerable<Post> Items, int TotalCount)> GetRecentPostsPagedAsync(int page, int pageSize)
+    {
+        string cacheKey = $"recent_posts_paged_{page}_{pageSize}";
+        var cached = await _cacheService.GetAsync<(IEnumerable<Post>, int)>(cacheKey);
+        
+        if (cached != default)
+        {
+            return cached;
+        }
+
+        var result = await _postRepository.GetRecentPostsPagedAsync(page, pageSize);
+        await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5));
+        
+        return result;
     }
 
     public async Task<Post> CreatePostAsync(Guid userId, Guid? placeId, string? placeName, double? latitude, double? longitude, string? city, string? country, string? mediaUrl, string? caption)
@@ -108,6 +143,8 @@ public class PostService : IPostService
         };
 
         var addedPost = await _postRepository.AddAsync(post);
+        await _cacheService.RemoveAsync("recent_posts_20");
+        await _cacheService.RemoveAsync("recent_posts_100");
 
         // Takip edenlere bildirim gönder
         var followers = await _followRepository.GetFollowersAsync(userId);
@@ -132,6 +169,8 @@ public class PostService : IPostService
             throw new InvalidOperationException($"Post with ID '{post.Id}' not found.");
 
         await _postRepository.UpdateAsync(post);
+        await _cacheService.RemoveAsync("recent_posts_20");
+        await _cacheService.RemoveAsync("recent_posts_100");
     }
 
     public async Task DeletePostAsync(Guid id)
@@ -141,6 +180,13 @@ public class PostService : IPostService
             throw new InvalidOperationException($"Post with ID '{id}' not found.");
 
         await _postRepository.DeleteAsync(post);
+        await _cacheService.RemoveAsync("recent_posts_20");
+        await _cacheService.RemoveAsync("recent_posts_100");
+    }
+
+    public async Task<IEnumerable<Post>> SearchPostsAsync(string? term, string? city, DateTime? fromDate, DateTime? toDate)
+    {
+        return await _postRepository.SearchPostsAsync(term, city, fromDate, toDate);
     }
 }
 

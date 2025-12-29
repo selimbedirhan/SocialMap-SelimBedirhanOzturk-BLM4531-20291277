@@ -20,6 +20,7 @@ public class LikeRepository : Repository<Like>, ILikeRepository
     public async Task<IEnumerable<Like>> GetByPostIdAsync(Guid postId)
     {
         return await _dbSet
+            .Include(l => l.User)
             .Where(l => l.PostId == postId)
             .ToListAsync();
     }

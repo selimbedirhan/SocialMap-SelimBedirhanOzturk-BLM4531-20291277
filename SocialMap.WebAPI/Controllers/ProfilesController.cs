@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Interfaces;
 
@@ -11,12 +12,14 @@ public class ProfilesController : ControllerBase
     private readonly IUserService _userService;
     private readonly IPostService _postService;
     private readonly IFollowService _followService;
+    private readonly IMapper _mapper;
 
-    public ProfilesController(IUserService userService, IPostService postService, IFollowService followService)
+    public ProfilesController(IUserService userService, IPostService postService, IFollowService followService, IMapper mapper)
     {
         _userService = userService;
         _postService = postService;
         _followService = followService;
+        _mapper = mapper;
     }
 
     [HttpGet("{userId}")]
@@ -34,30 +37,14 @@ public class ProfilesController : ControllerBase
 
             var profileDto = new
             {
-                user = new UserResponseDto
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    ProfilePhotoUrl = user.ProfilePhotoUrl,
-                    Bio = user.Bio,
-                    CreatedAt = user.CreatedAt
-                },
+                user = _mapper.Map<UserResponseDto>(user),
                 stats = new
                 {
                     postsCount = posts.Count(),
                     followerCount,
                     followingCount
                 },
-                posts = posts.Select(p => new
-                {
-                    p.Id,
-                    p.MediaUrl,
-                    p.Caption,
-                    p.LikesCount,
-                    commentsCount = p.CommentsCount > 0 ? p.CommentsCount : (p.Comments?.Count ?? 0),
-                    p.CreatedAt
-                })
+                posts = _mapper.Map<IEnumerable<PostResponseDto>>(posts)
             };
 
             return Ok(profileDto);

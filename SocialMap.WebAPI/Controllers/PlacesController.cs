@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Entities;
@@ -10,17 +11,19 @@ namespace SocialMap.WebAPI.Controllers;
 public class PlacesController : ControllerBase
 {
     private readonly IPlaceService _placeService;
+    private readonly IMapper _mapper;
 
-    public PlacesController(IPlaceService placeService)
+    public PlacesController(IPlaceService placeService, IMapper mapper)
     {
         _placeService = placeService;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlaceResponseDto>>> GetAllPlaces()
     {
         var places = await _placeService.GetAllPlacesAsync();
-        var placeDtos = places.Select(p => MapToPlaceResponseDto(p));
+        var placeDtos = _mapper.Map<IEnumerable<PlaceResponseDto>>(places);
         return Ok(placeDtos);
     }
 
@@ -31,14 +34,14 @@ public class PlacesController : ControllerBase
         if (place == null)
             return NotFound();
 
-        return Ok(MapToPlaceResponseDto(place));
+        return Ok(_mapper.Map<PlaceResponseDto>(place));
     }
 
     [HttpGet("city/{city}")]
     public async Task<ActionResult<IEnumerable<PlaceResponseDto>>> GetPlacesByCity(string city)
     {
         var places = await _placeService.GetPlacesByCityAsync(city);
-        var placeDtos = places.Select(p => MapToPlaceResponseDto(p));
+        var placeDtos = _mapper.Map<IEnumerable<PlaceResponseDto>>(places);
         return Ok(placeDtos);
     }
 
@@ -46,7 +49,7 @@ public class PlacesController : ControllerBase
     public async Task<ActionResult<IEnumerable<PlaceResponseDto>>> SearchPlaces([FromQuery] string term)
     {
         var places = await _placeService.SearchPlacesAsync(term);
-        var placeDtos = places.Select(p => MapToPlaceResponseDto(p));
+        var placeDtos = _mapper.Map<IEnumerable<PlaceResponseDto>>(places);
         return Ok(placeDtos);
     }
 
@@ -54,7 +57,7 @@ public class PlacesController : ControllerBase
     public async Task<ActionResult<IEnumerable<PlaceResponseDto>>> GetPlacesByUser(Guid userId)
     {
         var places = await _placeService.GetPlacesByCreatedUserIdAsync(userId);
-        var placeDtos = places.Select(p => MapToPlaceResponseDto(p));
+        var placeDtos = _mapper.Map<IEnumerable<PlaceResponseDto>>(places);
         return Ok(placeDtos);
     }
 
@@ -75,7 +78,7 @@ public class PlacesController : ControllerBase
                 dto.CreatedById);
 
             var placeDto = await _placeService.GetPlaceByIdAsync(place.Id);
-            return CreatedAtAction(nameof(GetPlaceById), new { id = place.Id }, MapToPlaceResponseDto(placeDto!));
+            return CreatedAtAction(nameof(GetPlaceById), new { id = place.Id }, _mapper.Map<PlaceResponseDto>(placeDto!));
         }
         catch (InvalidOperationException ex)
         {
@@ -114,24 +117,6 @@ public class PlacesController : ControllerBase
         }
     }
 
-    private static PlaceResponseDto MapToPlaceResponseDto(Place place)
-    {
-        return new PlaceResponseDto
-        {
-            Id = place.Id,
-            Name = place.Name,
-            City = place.City,
-            Country = place.Country,
-            District = place.District,
-            Latitude = place.Latitude,
-            Longitude = place.Longitude,
-            Description = place.Description,
-            Tags = place.Tags,
-            CreatedById = place.CreatedById,
-            CreatedByUsername = place.CreatedBy?.Username ?? "",
-            PostsCount = place.Posts?.Count ?? 0,
-            CreatedAt = place.CreatedAt
-        };
-    }
+
 }
 

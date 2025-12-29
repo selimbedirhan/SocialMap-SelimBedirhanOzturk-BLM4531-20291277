@@ -16,6 +16,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Like> Likes { get; set; }
     public DbSet<Follow> Follows { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Report> Reports { get; set; }
+    public DbSet<Hashtag> Hashtags { get; set; }
+    public DbSet<PostHashtag> PostHashtags { get; set; }
+    public DbSet<SavedPost> SavedPosts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -151,6 +155,48 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.RelatedUserId)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Hashtag Configuration
+        modelBuilder.Entity<Hashtag>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.Name).IsUnique();
+        });
+
+        // PostHashtag Configuration (Many-to-Many)
+        modelBuilder.Entity<PostHashtag>(entity =>
+        {
+            entity.HasKey(e => new { e.PostId, e.HashtagId });
+            
+            entity.HasOne(e => e.Post)
+                  .WithMany()
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(e => e.Hashtag)
+                  .WithMany(h => h.PostHashtags)
+                  .HasForeignKey(e => e.HashtagId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // SavedPost Configuration
+        modelBuilder.Entity<SavedPost>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(e => e.Post)
+                  .WithMany()
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.UserId, e.PostId }).IsUnique();
         });
     }
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import PostDetailModal from './PostDetailModal';
 
 export default function MyProfile({ user, onUserClick }) {
   const [profile, setProfile] = useState(null);
@@ -15,6 +16,7 @@ export default function MyProfile({ user, onUserClick }) {
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -122,10 +124,10 @@ export default function MyProfile({ user, onUserClick }) {
 
     try {
       setUploadingPhoto(true);
-      
+
       // Resmi yükle
       const uploadResult = await api.uploadImage(file);
-      
+
       // Kullanıcı bilgilerini güncelle
       const currentUser = await api.getUserById(user.id);
       await api.updateUserProfile(user.id, {
@@ -135,11 +137,11 @@ export default function MyProfile({ user, onUserClick }) {
 
       // Profili yeniden yükle
       await loadProfile();
-      
+
       // LocalStorage'daki kullanıcı bilgisini güncelle
       const updatedUser = { ...user, profilePhotoUrl: uploadResult.url };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      
+
       setShowPhotoUpload(false);
       setPhotoPreview(null);
       setIsDragging(false);
@@ -212,15 +214,15 @@ export default function MyProfile({ user, onUserClick }) {
               title="Profil resmini değiştirmek için tıklayın"
             />
           ) : (
-            <div 
-              style={{ 
-                width: '100px', 
-                height: '100px', 
-                borderRadius: '50%', 
-                background: '#ddd', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
+            <div
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                background: '#ddd',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 fontSize: '36px',
                 cursor: 'pointer'
               }}
@@ -243,9 +245,9 @@ export default function MyProfile({ user, onUserClick }) {
               minWidth: '320px',
               border: '1px solid #e0e0e0'
             }}>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '15px'
               }}>
@@ -641,7 +643,12 @@ export default function MyProfile({ user, onUserClick }) {
           <h3>Gönderiler ({profile.posts?.length ?? 0})</h3>
           <div className="posts-grid">
             {(profile.posts || []).map((post) => (
-              <div key={post.id} className="post-card">
+              <div
+                key={post.id}
+                className="post-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedPost(post)}
+              >
                 {post.mediaUrl && (
                   <img
                     src={`http://localhost:5280${post.mediaUrl}`}
@@ -681,7 +688,12 @@ export default function MyProfile({ user, onUserClick }) {
           <h3>Beğenilen Gönderiler ({likedPosts.length})</h3>
           <div className="posts-grid">
             {likedPosts.map((post) => (
-              <div key={post.id} className="post-card">
+              <div
+                key={post.id}
+                className="post-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedPost(post)}
+              >
                 {post.mediaUrl && (
                   <img
                     src={`http://localhost:5280${post.mediaUrl}`}
@@ -700,6 +712,19 @@ export default function MyProfile({ user, onUserClick }) {
             ))}
           </div>
         </div>
+      )}
+
+      {selectedPost && (
+        <PostDetailModal
+          post={selectedPost}
+          user={user}
+          onClose={() => setSelectedPost(null)}
+          onUserClick={onUserClick}
+          onLike={async (postId, isLiked) => {
+            // Opsiyonel: Listeyi güncelle
+            // Basitlik için sadece yerel state'i güncellemiyoruz, ama gerekirse eklenebilir.
+          }}
+        />
       )}
     </div>
   );

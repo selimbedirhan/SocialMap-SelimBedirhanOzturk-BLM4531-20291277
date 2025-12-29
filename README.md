@@ -1,249 +1,171 @@
 # 🗺️ SocialMap
 
-**SocialMap**, konum tabanlı sosyal medya uygulamasıdır. Kullanıcıların gönderilerini harita üzerinde görselleştirmesine, yer etiketlemesi yapmasına ve dünyayı keşfetmesine olanak tanır. Instagram benzeri bir arayüzle, gönderilerinizi harita üzerinde paylaşın ve keşfedin!
+**SocialMap**, konum tabanlı, modern ve interaktif bir sosyal medya platformudur. Kullanıcıların anılarını harita üzerinde ölümsüzleştirmesine, dünyayı keşfetmesine ve diğer kullanıcılarla etkileşime girmesine olanak tanır. Instagram benzeri kullanıcı deneyimini, gelişmiş harita özellikleriyle birleştirir.
 
-## 📋 İçindekiler
+![SocialMap Banner](https://via.placeholder.com/1200x400.png?text=SocialMap+Project)
 
-- [Özellikler](#-özellikler)
-- [Teknolojiler](#-teknolojiler)
-- [Kurulum](#-kurulum)
-- [Kullanım](#-kullanım)
-- [Proje Yapısı](#-proje-yapısı)
-- [API Dokümantasyonu](#-api-dokümantasyonu)
-- [Ekran Görüntüleri](#-ekran-görüntüleri)
-- [Katkıda Bulunma](#-katkıda-bulunma)
-- [Lisans](#-lisans)
+## 🌟 Proje Durumu
+
+Bu proje aşağıdaki fazları başarıyla tamamlamıştır:
+
+- ✅ **Faz 1: Güvenlik** (JWT, Rate Limiting, HTTPS, Secure Headers)
+- ✅ **Faz 2: Mimari** (Clean Architecture, UnitOfWork, Serilog, CQRS altyapısı)
+- ✅ **Faz 3: Özellikler** (Pagination, Admin Paneli, Raporlama Sistemi)
+- ✅ **Faz 4: DevOps** (Docker, Docker Compose, Health Checks, CI/CD)
+- ✅ **Faz 5: Test** (Kapsamlı Unit Testler)
+- ✅ **Faz 6: Yeni Özellikler** (Hashtag Sistemi, Koleksiyonlar/Favoriler)
+
+---
 
 ## ✨ Özellikler
 
-### 🎯 Temel Özellikler
+### 👤 Kullanıcı İşlemleri
+- **Güvenli Kimlik Doğrulama**: JWT tabanlı kayıt ve giriş
+- **Profil Yönetimi**: Biyografi, profil fotoğrafı ve kişisel ayarlar
+- **Takip Sistemi**: Takip etme, takibi bırakma ve takipçi/takip edilen listeleri
 
-- **📍 Instagram Benzeri Yer Etiketleme**: Yer adını yazarak arama yapın veya harita üzerinden doğrudan konum seçin
-- **🗺️ İnteraktif Harita Görünümü**: Gönderilerinizi harita üzerinde cluster'lar halinde görüntüleyin
-- **📸 Gönderi Paylaşımı**: Fotoğraf ve açıklama ile gönderiler oluşturun
-- **❤️ Beğeni Sistemi**: Gönderileri beğenin ve beğenileri görüntüleyin
-- **💬 Yorum Sistemi**: Gönderilere yorum yapın ve yorumları görüntüleyin
-- **👥 Kullanıcı Takip Sistemi**: Diğer kullanıcıları takip edin ve takipçilerinizi yönetin
-- **🔔 Gerçek Zamanlı Bildirimler**: SignalR ile anlık bildirimler alın
-- **🔍 Gelişmiş Arama**: Gönderiler, kullanıcılar ve yerler arasında arama yapın
-- **👤 Profil Yönetimi**: Profil fotoğrafı ve bio bilgilerinizi güncelleyin
+### 📸 Sosyal Etkileşim
+- **Gönderi Paylaşımı**: Fotoğraf, açıklama ve konum etiketi ile gönderi oluşturma
+- **İnteraktif Akış**: Takip edilenlerin ve popüler gönderilerin akışı
+- **Beğeni ve Yorum**: Gönderilere etkileşim verme
+- **Hashtag Sistemi**: `#etiket` ile gönderileri kategorize etme ve arama
+- **Koleksiyonlar**: Gönderileri favorilere kaydetme ve saklama
+- **Bildirimler**: Anlık etkileşim bildirimleri (SignalR)
 
-### 🗺️ Harita Özellikleri
+### 🗺️ Harita ve Keşfet
+- **Konum Bazlı Gönderiler**: Harita üzerinde gönderileri görüntüleme
+- **Akıllı Clustering**: Yoğun bölgelerdeki gönderileri gruplama (Geohash)
+- **Yer Arama**: Nominatim API ile detaylı yer ve mekan arama
+- **Yakınındakiler**: Konumunuza yakın gönderileri keşfetme
 
-- **Geohash Tabanlı Clustering**: Performanslı harita görselleştirmesi için geohash algoritması
-- **Zoom Seviyesine Göre Clustering**: Farklı zoom seviyelerinde optimize edilmiş cluster görünümü
-- **Konum Bazlı Gönderi Filtreleme**: Belirli bir bölgedeki gönderileri görüntüleyin
-- **OpenStreetMap Entegrasyonu**: Ücretsiz ve açık kaynak harita servisi
+### 🛡️ Yönetim ve Güvenlik
+- **Admin Paneli**: Kullanıcı, gönderi ve rapor yönetimi
+- **Raporlama Sistemi**: Uygunsuz içerikleri raporlama ve moderasyon
+- **Yasaklama (Ban)**: Kural ihlali yapan kullanıcıları engelleme
+- **Güvenlik Önlemleri**: XSS koruması, Rate Limiting, IP bloklama
+
+---
 
 ## 🛠️ Teknolojiler
 
-### Backend
-- **.NET 9.0** - Modern C# framework
-- **PostgreSQL** - İlişkisel veritabanı
-- **Entity Framework Core** - ORM
-- **SignalR** - Gerçek zamanlı iletişim
-- **Swagger/OpenAPI** - API dokümantasyonu
+### Backend (.NET 9.0)
+- **Mimari**: Clean Architecture (Core, Repository, Business, WebAPI)
+- **Veritabanı**: PostgreSQL 16 (Entity Framework Core)
+- **API**: ASP.NET Core Web API
+- **Gerçek Zamanlı**: SignalR
+- **Loglama**: Serilog (Dosya ve Konsol)
+- **Validasyon**: FluentValidation
+- **Mapping**: AutoMapper
+- **Test**: xUnit, Moq, FluentAssertions
 
-### Frontend
-- **React 19** - UI framework
-- **Vite** - Build tool
-- **React Router** - Routing
-- **Leaflet** - Harita görselleştirme
-- **React Leaflet** - React için Leaflet wrapper
-- **SignalR Client** - Gerçek zamanlı bildirimler
+### Frontend (React 19)
+- **Build Tool**: Vite
+- **Harita**: Leaflet & React Leaflet
+- **Styling**: Modern CSS3, Glassmorphism UI, Dark Mode
+- **State**: React Hooks & Context API
+- **Routing**: React Router v7
 
-### Harita ve Konum
-- **Geohash** - Konum kodlama algoritması
-- **OpenStreetMap** - Harita tile servisi
-- **Nominatim API** - Yer arama ve ters geocoding
+### DevOps & Altyapı
+- **Container**: Docker & Docker Compose (Multi-stage builds)
+- **Web Server**: Nginx (Frontend & Reverse Proxy)
+- **pipeline**: GitHub Actions (CI/CD)
+- **Health Checks**: Database ve API durum kontrolü
 
-## 📦 Kurulum
+---
 
-### Gereksinimler
+## 📦 Kurulum ve Çalıştırma
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- [Node.js](https://nodejs.org/) (v18 veya üzeri)
-- [PostgreSQL](https://www.postgresql.org/download/) (v12 veya üzeri)
-- npm veya yarn
+### Ön Gereksinimler
+- Docker Desktop
+- Git
 
-### 1. Repository'yi Klonlayın
+### 🚀 Hızlı Başlangıç (Docker ile)
 
-```bash
-git clone https://github.com/kullaniciadi/SocialMap.git
-cd SocialMap
-```
+En kolay kurulum yöntemidir. Tüm servisler (API, Frontend, Database) otomatik olarak ayağa kalkar.
 
-### 2. Veritabanı Kurulumu
+1. **Projeyi klonlayın:**
+   ```bash
+   git clone https://github.com/kullaniciadi/SocialMap.git
+   cd SocialMap
+   ```
 
-PostgreSQL'de yeni bir veritabanı oluşturun:
+2. **Uygulamayı başlatın:**
+   ```bash
+   docker-compose up -d --build
+   ```
 
-```sql
-CREATE DATABASE SocialMapDB;
-```
+3. **Erişim:**
+   - Frontend: `http://localhost:80`
+   - Backend API: `http://localhost:5280`
+   - Swagger UI: `http://localhost:5280/swagger`
+   - Health Check: `http://localhost:5280/health`
 
-### 3. Backend Kurulumu
+### 💻 Lokal Geliştirme Ortamı
 
+Eğer Docker kullanmadan geliştirmek isterseniz:
+
+**Backend:**
 ```bash
 cd SocialMap.WebAPI
-```
-
-`appsettings.Development.json` dosyasında veritabanı bağlantı bilgilerinizi güncelleyin:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=SocialMapDB;Username=postgres;Password=yourpassword"
-  }
-}
-```
-
-Bağımlılıkları yükleyin ve projeyi çalıştırın:
-
-```bash
+# appsettings.Development.json dosyasındaki DB bağlantısını düzenleyin
 dotnet restore
 dotnet run
 ```
 
-Backend `http://localhost:5280` adresinde çalışacaktır.
-
-### 4. Frontend Kurulumu
-
-Yeni bir terminal açın:
-
+**Frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend `http://localhost:5173` adresinde çalışacaktır.
+---
 
-## 🚀 Kullanım
+## 🏛️ Proje Mimarisi
 
-### İlk Giriş
-
-1. Uygulamayı açın ve kayıt olun
-2. Kullanıcı adı, e-posta ve şifre ile hesap oluşturun
-3. Giriş yaptıktan sonra ana sayfaya yönlendirileceksiniz
-
-### Gönderi Paylaşma
-
-1. **"Yeni Gönderi"** butonuna tıklayın
-2. **Yer Etiketi** bölümünde:
-   - Yer adını yazın (örn: "Anıtkabir", "İstanbul")
-   - Arama sonuçlarından birini seçin VEYA
-   - **"Haritadan Konum Seç"** butonuna tıklayıp harita üzerinden konum seçin
-3. İsteğe bağlı olarak fotoğraf yükleyin
-4. Açıklama ekleyin
-5. **"Paylaş"** butonuna tıklayın
-
-### Harita Görünümü
-
-1. **"Harita"** sekmesine gidin
-2. Harita üzerinde cluster'ları görüntüleyin
-3. Zoom yaparak daha detaylı görünüm elde edin
-4. Cluster'lara tıklayarak o bölgedeki gönderileri görüntüleyin
-
-### Diğer Kullanıcıları Takip Etme
-
-1. Bir kullanıcının profil sayfasına gidin
-2. **"Takip Et"** butonuna tıklayın
-3. Takip ettiğiniz kullanıcıların gönderilerini ana sayfada göreceksiniz
-
-## 📁 Proje Yapısı
+Proje, sürdürülebilirlik ve test edilebilirlik için **Onion Architecture** (Clean Architecture) prensiplerine göre tasarlanmıştır.
 
 ```
 SocialMap/
-├── SocialMap.Core/              # Domain entities, DTOs, interfaces
-│   ├── Entities/                 # Veritabanı entity'leri
-│   ├── DTOs/                     # Data Transfer Objects
-│   └── Interfaces/               # Service ve Repository interface'leri
-│
-├── SocialMap.Repository/         # Veri erişim katmanı
-│   ├── Data/                     # DbContext ve migration helper'lar
-│   └── Repositories/             # Repository implementasyonları
-│
-├── SocialMap.Business/            # İş mantığı katmanı
-│   ├── Services/                 # Business service'leri
-│   └── Utils/                     # Yardımcı sınıflar (GeohashUtil)
-│
-├── SocialMap.WebAPI/              # API katmanı
-│   ├── Controllers/              # API controller'ları
-│   ├── Hubs/                     # SignalR hub'ları
-│   └── Services/                 # API servisleri
-│
-└── frontend/                      # React frontend
-    ├── src/
-    │   ├── components/           # React component'leri
-    │   ├── services/             # API servisleri
-    │   └── App.jsx               # Ana uygulama component'i
-    └── package.json
+├── SocialMap.Core/           # Varlıklar, Arayüzler, DTO'lar (Bağımlılıksız)
+├── SocialMap.Repository/     # Veri Erişimi, EF Core, Migrations
+├── SocialMap.Business/       # İş Mantığı, Servisler, Validasyonlar
+├── SocialMap.WebAPI/         # Controller'lar, Middleware'ler, CI/CD
+└── frontend/                 # React Uygulaması
 ```
 
-## 📚 API Dokümantasyonu
-
-Backend çalıştığında Swagger UI'ya şu adresten erişebilirsiniz:
-```
-http://localhost:5280/swagger
-```
-
-### Önemli Endpoint'ler
-
-#### Gönderiler
-- `GET /api/posts` - Tüm gönderileri listele
-- `POST /api/posts` - Yeni gönderi oluştur
-- `GET /api/posts/{id}` - Belirli bir gönderiyi getir
-- `GET /api/posts/user/{userId}` - Kullanıcının gönderilerini getir
-
-#### Harita
-- `GET /api/map/clusters` - Harita cluster'larını getir
-  - Query params: `north`, `south`, `east`, `west`, `zoom`
-
-#### Kullanıcılar
-- `GET /api/users` - Tüm kullanıcıları listele
-- `POST /api/users` - Yeni kullanıcı oluştur
-- `GET /api/users/{id}` - Kullanıcı bilgilerini getir
-
-#### Takip
-- `POST /api/follows/{followerId}/follow/{followingId}` - Kullanıcıyı takip et
-- `DELETE /api/follows/{followerId}/unfollow/{followingId}` - Takibi bırak
-- `GET /api/follows/{userId}/followers` - Takipçileri listele
-- `GET /api/follows/{userId}/following` - Takip edilenleri listele
-
-#### Bildirimler
-- `GET /api/notifications/{userId}` - Kullanıcının bildirimlerini getir
-- `PUT /api/notifications/{id}/read` - Bildirimi okundu olarak işaretle
-
-## 🎨 Ekran Görüntüleri
-
-> **Not:** Ekran görüntüleri eklenecek
-
-## 🤝 Katkıda Bulunma
-
-Katkılarınızı bekliyoruz! Lütfen şu adımları izleyin:
-
-1. Fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add some amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-## 📝 Lisans
-
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
-
-## 👤 Yazar
-
-**Selim Bedirhan Öztürk**
-
-- GitHub: [@kullaniciadi](https://github.com/kullaniciadi)
-
-## 🙏 Teşekkürler
-
-- [OpenStreetMap](https://www.openstreetmap.org/) - Harita verileri için
-- [Nominatim](https://nominatim.org/) - Yer arama API'si için
-- [Leaflet](https://leafletjs.com/) - Harita kütüphanesi için
+### Tasarım Desenleri
+- **Repository Pattern**: Veri erişim soyutlaması (`IReadRepository`, `IWriteRepository`)
+- **Unit of Work**: Transaction yönetimi ve atomik işlemler
+- **Dependency Injection**: Gevşek bağlı bileşenler
 
 ---
 
-⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
+## 📚 API Dokümantasyonu
+
+Backend çalıştığında Swagger arayüzü üzerinden tüm endpoint'leri test edebilirsiniz: `http://localhost:5280/swagger`
+
+**Öne Çıkan Endpoint'ler:**
+- `GET /api/hashtags/trending` - Popüler etiketler
+- `GET /api/posts/paged` - Sayfalı gönderi akışı
+- `GET /api/admin/stats` - Admin dashboard istatistikleri
+- `POST /api/savedposts` - Gönderiyi koleksiyona ekle
+
+---
+
+## 🤝 Katkıda Bulunma
+
+1. Forklayın
+2. Feature branch oluşturun (`git checkout -b feature/harika-ozellik`)
+3. Commit leyin (`git commit -m 'Harika özellik eklendi'`)
+4. Pushlayın (`git push origin feature/harika-ozellik`)
+5. Pull Request gönderin
+
+---
+
+## 📝 Lisans
+
+Bu proje MIT lisansı altındadır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
+
+---
+**Geliştirici**: Selim Bedirhan Öztürk

@@ -8,6 +8,18 @@ public class User
     public string PasswordHash { get; set; } = null!;
     public string? ProfilePhotoUrl { get; set; }
     public string? Bio { get; set; }
+    
+    /// <summary>
+    /// Admin yetkisi
+    /// </summary>
+    public bool IsAdmin { get; set; } = false;
+    
+    /// <summary>
+    /// Kullanıcı yasaklandı mı
+    /// </summary>
+    public bool IsBanned { get; set; } = false;
+    public string? BanReason { get; set; }
+    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<Post> Posts { get; set; } = new List<Post>();

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Entities;
 using SocialMap.Core.Interfaces;
@@ -8,6 +9,7 @@ namespace SocialMap.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentService;
@@ -22,6 +24,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<CommentResponseDto>> GetCommentById(Guid id)
     {
         var comment = await _commentService.GetCommentByIdAsync(id);
@@ -32,6 +35,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpGet("post/{postId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetCommentsByPost(Guid postId)
     {
         var comments = await _commentService.GetCommentsByPostIdAsync(postId);
@@ -40,6 +44,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpGet("user/{userId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetCommentsByUser(Guid userId)
     {
         var comments = await _commentService.GetCommentsByUserIdAsync(userId);
@@ -48,6 +53,7 @@ public class CommentsController : ControllerBase
     }
 
     [HttpGet("reply/{parentCommentId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetReplies(Guid parentCommentId)
     {
         var replies = await _commentService.GetRepliesByCommentIdAsync(parentCommentId);

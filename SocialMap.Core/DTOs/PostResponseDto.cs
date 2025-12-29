@@ -5,6 +5,7 @@ public class PostResponseDto
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string Username { get; set; } = null!;
+    public string? UserProfilePhotoUrl { get; set; }
     public Guid? PlaceId { get; set; } // Nullable for backward compatibility
     public string PlaceName { get; set; } = null!;
     public string PlaceLocation { get; set; } = null!; // "Anıtkabir - Ankara - Türkiye"

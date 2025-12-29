@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 using SocialMap.Core.Entities;
 using SocialMap.Core.Interfaces;
+using SocialMap.Core.DTOs;
 
 namespace SocialMap.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class LikesController : ControllerBase
 {
     private readonly ILikeService _likeService;
+    private readonly IMapper _mapper;
 
-    public LikesController(ILikeService likeService)
+    public LikesController(ILikeService likeService, IMapper mapper)
     {
         _likeService = likeService;
+        _mapper = mapper;
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<Like>> GetLikeById(Guid id)
     {
         var like = await _likeService.GetLikeByIdAsync(id);
@@ -26,13 +33,15 @@ public class LikesController : ControllerBase
     }
 
     [HttpGet("post/{postId}")]
-    public async Task<ActionResult<IEnumerable<Like>>> GetLikesByPost(Guid postId)
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<LikeResponseDto>>> GetLikesByPost(Guid postId)
     {
         var likes = await _likeService.GetLikesByPostIdAsync(postId);
-        return Ok(likes);
+        return Ok(_mapper.Map<IEnumerable<LikeResponseDto>>(likes));
     }
 
     [HttpGet("user/{userId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<Like>>> GetLikesByUser(Guid userId)
     {
         var likes = await _likeService.GetLikesByUserIdAsync(userId);
@@ -40,6 +49,7 @@ public class LikesController : ControllerBase
     }
 
     [HttpGet("post/{postId}/user/{userId}/check")]
+    [AllowAnonymous]
     public async Task<ActionResult<bool>> IsLiked(Guid postId, Guid userId)
     {
         var isLiked = await _likeService.IsPostLikedByUserAsync(postId, userId);

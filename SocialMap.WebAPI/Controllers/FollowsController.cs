@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Interfaces;
 using SocialMap.WebAPI.Services;
@@ -7,6 +8,7 @@ namespace SocialMap.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class FollowsController : ControllerBase
 {
     private readonly IFollowService _followService;
@@ -58,6 +60,7 @@ public class FollowsController : ControllerBase
     }
 
     [HttpGet("{followerId}/is-following/{followingId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<bool>> IsFollowing(Guid followerId, Guid followingId)
     {
         var isFollowing = await _followService.IsFollowingAsync(followerId, followingId);
@@ -65,6 +68,7 @@ public class FollowsController : ControllerBase
     }
 
     [HttpGet("{userId}/followers")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetFollowers(Guid userId)
     {
         var followers = await _followService.GetFollowersAsync(userId);
@@ -81,6 +85,7 @@ public class FollowsController : ControllerBase
     }
 
     [HttpGet("{userId}/following")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetFollowing(Guid userId)
     {
         var following = await _followService.GetFollowingAsync(userId);
@@ -97,6 +102,7 @@ public class FollowsController : ControllerBase
     }
 
     [HttpGet("{userId}/stats")]
+    [AllowAnonymous]
     public async Task<ActionResult<object>> GetStats(Guid userId)
     {
         var followerCount = await _followService.GetFollowerCountAsync(userId);

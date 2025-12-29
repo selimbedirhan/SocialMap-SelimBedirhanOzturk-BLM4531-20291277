@@ -123,7 +123,7 @@ export default function Home({ user, onUserClick }) {
       {error && <div className="error">{error}</div>}
 
       {showForm && (
-        <form className="form" onSubmit={handleSubmit} style={{ marginBottom: '30px', background: '#f9f9f9', padding: '20px', borderRadius: '8px' }}>
+        <form className="form" onSubmit={handleSubmit} style={{ marginBottom: '30px' }}>
           <PlaceSearch onPlaceSelect={handlePlaceSelect} />
           <div className="form-group">
             <label>Fotoğraf Yükle (Opsiyonel)</label>
@@ -242,8 +242,8 @@ function PostCard({ post, user, onLike, onUserClick }) {
     <div className="post-card" style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
       <div className="post-header">
         <div>
-          <div 
-            className="post-username" 
+          <div
+            className="post-username"
             style={{ cursor: 'pointer', textDecoration: 'underline' }}
             onClick={() => onUserClick && post.userId && onUserClick(post.userId)}
           >
@@ -256,10 +256,10 @@ function PostCard({ post, user, onLike, onUserClick }) {
       </div>
       {post.mediaUrl && (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-          <img 
-            src={`http://localhost:5280${post.mediaUrl}`} 
-            alt={post.caption} 
-            className="post-image" 
+          <img
+            src={`http://localhost:5280${post.mediaUrl}`}
+            alt={post.caption}
+            className="post-image"
             style={{ width: '100%', maxWidth: '100%' }}
           />
         </div>

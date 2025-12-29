@@ -27,8 +27,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var passwordHash = HashPassword(dto.Password);
-            var user = await _userService.CreateUserAsync(dto.Username, dto.Email, passwordHash);
+            var user = await _userService.CreateUserAsync(dto.Username, dto.Email, dto.Password);
 
             var token = GenerateJwtToken(user);
             var userDto = new UserResponseDto
@@ -101,12 +100,6 @@ public class AuthController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static string HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = Encoding.UTF8.GetBytes(password);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
-    }
+
 }
 

@@ -12,20 +12,24 @@ L.Icon.Default.mergeOptions({
 });
 
 // Nominatim API ile yer arama
-async function searchPlaces(query) {
+async function searchPlaces(query, viewbox = null) {
   if (!query || query.trim().length < 3) {
     return [];
   }
 
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1`,
-      {
-        headers: {
-          'User-Agent': 'SocialMap/1.0',
-        },
-      }
-    );
+    let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1`;
+
+    // Viewbox varsa ekle (left,top,right,bottom -> west,north,east,south)
+    if (viewbox) {
+      url += `&viewbox=${viewbox}&bounded=0`; // bounded=0: kutu dışındakileri de göster ama kutu içindekileri önceliklendir
+    }
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'SocialMap/1.0',
+      },
+    });
     const data = await response.json();
     return data.map((item) => ({
       id: item.place_id,
@@ -73,9 +77,31 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
   const [mapCenter, setMapCenter] = useState([39.9334, 32.8597]); // Ankara default
   const [mapPosition, setMapPosition] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [userViewbox, setUserViewbox] = useState(null);
   const searchTimeoutRef = useRef(null);
 
   useEffect(() => {
+    // Kullanıcının konumunu al ve viewbox oluştur
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // Yaklaşık 0.5 derece (~50km) yarıçapında bir kutu oluştur
+          // Format: left,top,right,bottom (west, north, east, south)
+          const viewbox = `${longitude - 0.5},${latitude + 0.5},${longitude + 0.5},${latitude - 0.5}`;
+          setUserViewbox(viewbox);
+
+          // Eğer başlangıç yeri yoksa harita merkezini de güncelle
+          if (!initialPlace) {
+            setMapCenter([latitude, longitude]);
+          }
+        },
+        (error) => {
+          console.log('Konum alınamadı:', error);
+        }
+      );
+    }
+
     if (initialPlace) {
       setSelectedPlace(initialPlace);
       if (initialPlace.latitude && initialPlace.longitude) {
@@ -94,7 +120,7 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
     if (searchQuery.trim().length >= 3) {
       setIsSearching(true);
       searchTimeoutRef.current = setTimeout(async () => {
-        const results = await searchPlaces(searchQuery);
+        const results = await searchPlaces(searchQuery, userViewbox);
         setSearchResults(results);
         setIsSearching(false);
       }, 500);
@@ -108,7 +134,7 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery]);
+  }, [searchQuery, userViewbox]);
 
   const handlePlaceSelect = (place) => {
     setSelectedPlace(place);
@@ -182,7 +208,7 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
     <div style={{ marginBottom: '20px' }}>
       <div className="form-group">
         <label>
-          Yer Etiketi <span style={{ color: 'red' }}>*</span>
+          Yer Etiketi <span className="text-red-500">*</span>
         </label>
         <div style={{ position: 'relative' }}>
           <input
@@ -190,22 +216,16 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Yer adı yazın (örn: Anıtkabir, İstanbul)"
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '14px',
-            }}
+            className="w-full"
           />
           {isSearching && (
             <div
               style={{
                 position: 'absolute',
-                right: '10px',
+                right: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#7f8c8d',
+                color: 'var(--text-muted)',
                 fontSize: '12px',
               }}
             >
@@ -213,38 +233,21 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
             </div>
           )}
         </div>
-        <small style={{ color: '#7f8c8d' }}>
+        <small style={{ color: 'var(--text-muted)' }}>
           Yer adını yazın veya harita üzerinden konum seçin
         </small>
 
         {/* Arama sonuçları */}
         {searchResults.length > 0 && (
-          <div
-            style={{
-              marginTop: '5px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              maxHeight: '200px',
-              overflowY: 'auto',
-              backgroundColor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
+          <div className="search-results-dropdown">
             {searchResults.map((place) => (
               <div
                 key={place.id}
                 onClick={() => handlePlaceSelect(place)}
-                style={{
-                  padding: '10px',
-                  cursor: 'pointer',
-                  borderBottom: '1px solid #eee',
-                  transition: 'background-color 0.2s',
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = '#f5f5f5')}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = 'white')}
+                className="search-result-item"
               >
-                <div style={{ fontWeight: 'bold', color: '#2c3e50' }}>{place.name}</div>
-                <div style={{ fontSize: '12px', color: '#7f8c8d', marginTop: '2px' }}>
+                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{place.name}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                   {place.fullName}
                 </div>
               </div>
@@ -254,22 +257,14 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
 
         {/* Seçilen yer bilgisi */}
         {selectedPlace && (
-          <div
-            style={{
-              marginTop: '10px',
-              padding: '10px',
-              backgroundColor: '#e8f5e9',
-              borderRadius: '4px',
-              border: '1px solid #4caf50',
-            }}
-          >
+          <div className="selected-place-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
                   📍 {selectedPlace.placeName || selectedPlace.fullName}
                 </div>
                 {selectedPlace.city && (
-                  <div style={{ fontSize: '12px', color: '#7f8c8d', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                     {selectedPlace.city}
                     {selectedPlace.country && `, ${selectedPlace.country}`}
                   </div>
@@ -278,15 +273,7 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
               <button
                 type="button"
                 onClick={handleClear}
-                style={{
-                  padding: '5px 10px',
-                  backgroundColor: '#e74c3c',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                }}
+                className="btn btn-danger btn-sm"
               >
                 Temizle
               </button>
@@ -298,32 +285,15 @@ export default function PlaceSearch({ onPlaceSelect, initialPlace = null }) {
         <button
           type="button"
           onClick={() => setShowMap(!showMap)}
-          style={{
-            marginTop: '10px',
-            padding: '8px 15px',
-            backgroundColor: '#3498db',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px',
-          }}
+          className="btn btn-primary"
+          style={{ marginTop: '10px' }}
         >
           {showMap ? '📍 Haritayı Gizle' : '📍 Haritadan Konum Seç'}
         </button>
 
         {/* Harita */}
         {showMap && (
-          <div
-            style={{
-              marginTop: '10px',
-              height: '300px',
-              width: '100%',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              border: '1px solid #ddd',
-            }}
-          >
+          <div className="map-container">
             <MapContainer
               center={mapCenter}
               zoom={13}

@@ -14,10 +14,10 @@ export default function Notifications({ userId }) {
 
       // SignalR bağlantısı kur ve bildirimleri dinle
       const connection = getConnection(userId);
-      
+
       const handleNewNotification = (notification) => {
         console.log('Yeni bildirim alındı:', notification);
-        
+
         // Bildirimi API formatına uygun hale getir
         const formattedNotification = {
           id: notification.id,
@@ -44,7 +44,7 @@ export default function Notifications({ userId }) {
           setUnreadCount(prev => prev + 1);
         }
       };
-      
+
       connection.on('ReceiveNotification', handleNewNotification);
 
       return () => {
@@ -77,7 +77,7 @@ export default function Notifications({ userId }) {
     try {
       await api.markAsRead(notificationId);
       // State'i güncelle - API'yi tekrar çağırmak yerine direkt güncelle
-      setNotifications(prev => 
+      setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
@@ -90,7 +90,7 @@ export default function Notifications({ userId }) {
     try {
       await api.markAllAsRead(userId);
       // State'i güncelle - API'yi tekrar çağırmak yerine direkt güncelle
-      setNotifications(prev => 
+      setNotifications(prev =>
         prev.map(n => ({ ...n, isRead: true }))
       );
       setUnreadCount(0);
@@ -132,26 +132,21 @@ export default function Notifications({ userId }) {
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className="comment"
-              style={{
-                background: notification.isRead ? '#f9f9f9' : '#e3f2fd',
-                cursor: 'pointer',
-                opacity: notification.isRead ? 0.7 : 1
-              }}
+              className={`notification-card ${!notification.isRead ? 'unread' : ''}`}
               onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
             >
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <span style={{ fontSize: '20px' }}>{getNotificationIcon(notification.type)}</span>
-                <div style={{ flex: 1 }}>
-                  <div className="comment-text">{notification.message}</div>
-                  <div style={{ fontSize: '12px', color: '#7f8c8d', marginTop: '5px' }}>
-                    {new Date(notification.createdAt).toLocaleString('tr-TR')}
-                  </div>
-                </div>
-                {!notification.isRead && (
-                  <div style={{ width: '10px', height: '10px', background: '#3498db', borderRadius: '50%' }}></div>
-                )}
+              <div className="notification-icon">
+                {getNotificationIcon(notification.type)}
               </div>
+              <div style={{ flex: 1 }}>
+                <div className="notification-message">{notification.message}</div>
+                <div className="notification-time">
+                  {new Date(notification.createdAt).toLocaleString('tr-TR')}
+                </div>
+              </div>
+              {!notification.isRead && (
+                <div className="unread-dot"></div>
+              )}
             </div>
           ))}
         </div>

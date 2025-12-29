@@ -32,13 +32,16 @@ public class UserService : IUserService
         return await _userRepository.GetAllAsync();
     }
 
-    public async Task<User> CreateUserAsync(string username, string email, string passwordHash)
+    public async Task<User> CreateUserAsync(string username, string email, string password)
     {
         if (await UsernameExistsAsync(username))
             throw new InvalidOperationException($"Username '{username}' already exists.");
 
         if (await EmailExistsAsync(email))
             throw new InvalidOperationException($"Email '{email}' already exists.");
+
+        // Şifreyi BCrypt ile hashle
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
         var user = new User
         {
@@ -93,15 +96,30 @@ public class UserService : IUserService
         if (user == null)
             return null;
 
-        // Basit hash kontrolü (production'da BCrypt kullanılmalı)
-        var passwordHash = HashPassword(password);
-        if (user.PasswordHash != passwordHash)
+        // 1. Önce BCrypt ile doğrulamayı dene (yeni ve güncellenmiş kullanıcılar için)
+        // BCrypt hashi genellikle $2a$ veya benzeri bir prefix ile başlar
+        if (user.PasswordHash.StartsWith("$2"))
+        {
+            if (BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                return user;
             return null;
+        }
 
-        return user;
+        // 2. Eğer BCrypt değilse, eski SHA256 hash'ini dene (mevcut kullanıcılar için)
+        // Lazy Migration: Eğer eski hash tutuyorsa, kullanıcıyı yeni sisteme geçir
+        var legacyHash = HashPasswordLegacy(password);
+        if (user.PasswordHash == legacyHash)
+        {
+            // Kullanıcıyı güncelle: Şifreyi BCrypt ile hashle ve kaydet
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            await _userRepository.UpdateAsync(user);
+            return user;
+        }
+
+        return null;
     }
 
-    private static string HashPassword(string password)
+    private static string HashPasswordLegacy(string password)
     {
         using var sha256 = System.Security.Cryptography.SHA256.Create();
         var bytes = System.Text.Encoding.UTF8.GetBytes(password);

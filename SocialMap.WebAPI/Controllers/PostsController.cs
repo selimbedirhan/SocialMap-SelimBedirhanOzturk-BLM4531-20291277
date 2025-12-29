@@ -1,4 +1,6 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SocialMap.Core.DTOs;
 using SocialMap.Core.Entities;
 using SocialMap.Core.Interfaces;
@@ -8,26 +10,30 @@ namespace SocialMap.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
     private readonly NotificationBroadcaster _notificationBroadcaster;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IMapper _mapper;
 
-    public PostsController(IPostService postService, NotificationBroadcaster notificationBroadcaster, INotificationRepository notificationRepository)
+    public PostsController(IPostService postService, NotificationBroadcaster notificationBroadcaster, INotificationRepository notificationRepository, IMapper mapper)
     {
         _postService = postService;
         _notificationBroadcaster = notificationBroadcaster;
         _notificationRepository = notificationRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetRecentPosts([FromQuery] int count = 20)
     {
         try
         {
             var posts = await _postService.GetRecentPostsAsync(count);
-            var postDtos = posts.Select(p => MapToPostResponseDto(p));
+            var postDtos = _mapper.Map<IEnumerable<PostResponseDto>>(posts);
             return Ok(postDtos);
         }
         catch (Exception ex)
@@ -41,23 +47,64 @@ public class PostsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Sayfalanmış gönderi listesi
+    /// </summary>
+    [HttpGet("paged")]
+    [AllowAnonymous]
+    public async Task<ActionResult<SocialMap.Core.DTOs.PaginatedResponse<PostResponseDto>>> GetRecentPostsPaged(
+        [FromQuery] int page = 1, 
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+            if (pageSize > 100) pageSize = 100;
+
+            var (items, totalCount) = await _postService.GetRecentPostsPagedAsync(page, pageSize);
+            var postDtos = _mapper.Map<IEnumerable<PostResponseDto>>(items);
+
+            var response = new SocialMap.Core.DTOs.PaginatedResponse<PostResponseDto>
+            {
+                Items = postDtos,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            #if DEBUG
+            return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
+            #else
+            return StatusCode(500, new { error = ex.Message });
+            #endif
+        }
+    }
+
+
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<PostResponseDto>> GetPostById(Guid id)
     {
         var post = await _postService.GetPostByIdAsync(id);
         if (post == null)
             return NotFound();
 
-        return Ok(MapToPostResponseDto(post));
+        return Ok(_mapper.Map<PostResponseDto>(post));
     }
 
     [HttpGet("user/{userId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetPostsByUser(Guid userId)
     {
         try
         {
             var posts = await _postService.GetPostsByUserIdAsync(userId);
-            var postDtos = posts.Select(p => MapToPostResponseDto(p));
+            var postDtos = _mapper.Map<IEnumerable<PostResponseDto>>(posts);
             return Ok(postDtos);
         }
         catch (Exception ex)
@@ -77,7 +124,7 @@ public class PostsController : ControllerBase
         try
         {
             var posts = await _postService.GetPostsByPlaceIdAsync(placeId);
-            var postDtos = posts.Select(p => MapToPostResponseDto(p));
+            var postDtos = _mapper.Map<IEnumerable<PostResponseDto>>(posts);
             return Ok(postDtos);
         }
         catch (Exception ex)
@@ -122,7 +169,7 @@ public class PostsController : ControllerBase
             // İleride PostService'e NotificationBroadcaster inject edip direkt gönderebiliriz
 
             var postDto = await _postService.GetPostByIdAsync(post.Id);
-            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, MapToPostResponseDto(postDto!));
+            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, _mapper.Map<PostResponseDto>(postDto!));
         }
         catch (InvalidOperationException ex)
         {
@@ -131,19 +178,23 @@ public class PostsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePost(Guid id, [FromBody] Post post)
+    public async Task<IActionResult> UpdatePost(Guid id, [FromBody] UpdatePostDto dto)
     {
         try
         {
-            if (id != post.Id)
-                return BadRequest("ID mismatch");
+            var existingPost = await _postService.GetPostByIdAsync(id);
+            if (existingPost == null)
+                return NotFound("Post not found");
 
-            await _postService.UpdatePostAsync(post);
+            existingPost.Caption = dto.Caption;
+            // Optionally update other fields if needed in future
+
+            await _postService.UpdatePostAsync(existingPost);
             return NoContent();
         }
         catch (InvalidOperationException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ex.Message); // Or BadRequest depending on logic
         }
     }
 
@@ -159,69 +210,6 @@ public class PostsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-    }
-
-    private static PostResponseDto MapToPostResponseDto(Post post)
-    {
-        if (post == null)
-            throw new ArgumentNullException(nameof(post));
-
-        // Yer bilgilerini belirle - önce direkt post'tan, yoksa Place'den
-        string placeName = post.PlaceName ?? post.Place?.Name ?? "";
-        string city = post.City ?? post.Place?.City ?? "";
-        string country = post.Country ?? post.Place?.Country ?? "Türkiye";
-        
-        var placeLocation = !string.IsNullOrWhiteSpace(placeName)
-            ? $"{placeName}" + (!string.IsNullOrWhiteSpace(city) ? $" - {city}" : "") + (!string.IsNullOrWhiteSpace(country) ? $" - {country}" : "")
-            : "";
-
-        // CommentsCount için fallback: Eğer property 0 ise ve Comments collection varsa, onu kullan
-        var commentsCount = post.CommentsCount;
-        if (commentsCount == 0 && post.Comments != null && post.Comments.Any())
-        {
-            commentsCount = post.Comments.Count;
-        }
-
-        return new PostResponseDto
-        {
-            Id = post.Id,
-            UserId = post.UserId,
-            Username = post.User?.Username ?? "",
-            PlaceId = post.PlaceId,
-            PlaceName = placeName,
-            PlaceLocation = placeLocation,
-            Latitude = post.Latitude,
-            Longitude = post.Longitude,
-            MediaUrl = post.MediaUrl,
-            Caption = post.Caption,
-            LikesCount = post.LikesCount,
-            CommentsCount = commentsCount,
-            CreatedAt = post.CreatedAt,
-            Comments = post.Comments?.Select(c => MapToCommentResponseDto(c)).ToList() ?? new List<CommentResponseDto>(),
-            Likes = post.Likes?.Select(l => new LikeResponseDto
-            {
-                Id = l.Id,
-                PostId = l.PostId,
-                UserId = l.UserId,
-                Username = l.User?.Username ?? "",
-                CreatedAt = l.CreatedAt
-            }).ToList() ?? new List<LikeResponseDto>()
-        };
-    }
-
-    private static CommentResponseDto MapToCommentResponseDto(Comment comment)
-    {
-        return new CommentResponseDto
-        {
-            Id = comment.Id,
-            PostId = comment.PostId,
-            UserId = comment.UserId,
-            Username = comment.User?.Username ?? "",
-            Text = comment.Text,
-            ParentCommentId = comment.ParentCommentId,
-            CreatedAt = comment.CreatedAt,
-            Replies = comment.Replies?.Select(r => MapToCommentResponseDto(r)).ToList() ?? new List<CommentResponseDto>()
-        };
     }
 }
 

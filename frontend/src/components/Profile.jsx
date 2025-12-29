@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import PostDetailModal from './PostDetailModal';
 
 export default function Profile({ userId, currentUserId, onUserClick }) {
   const [profile, setProfile] = useState(null);
@@ -12,6 +13,7 @@ export default function Profile({ userId, currentUserId, onUserClick }) {
   const [likedPosts, setLikedPosts] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     if (userId) {
@@ -122,21 +124,30 @@ export default function Profile({ userId, currentUserId, onUserClick }) {
     return <div className="error">Profil bulunamadı.</div>;
   }
 
+  // Helper for rendering avatar
+  const renderAvatar = (user) => {
+    if (user.profilePhotoUrl) {
+      return (
+        <img
+          src={`http://localhost:5280${user.profilePhotoUrl}`}
+          alt={user.username}
+          style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+        />
+      );
+    } else {
+      return (
+        <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>
+          {user.username[0].toUpperCase()}
+        </div>
+      );
+    }
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px' }}>
         <div>
-          {profile.user.profilePhotoUrl ? (
-            <img
-              src={`http://localhost:5280${profile.user.profilePhotoUrl}`}
-              alt={profile.user.username}
-              style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
-            />
-          ) : (
-            <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>
-              {profile.user.username[0].toUpperCase()}
-            </div>
-          )}
+          {renderAvatar(profile.user)}
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
@@ -391,23 +402,28 @@ export default function Profile({ userId, currentUserId, onUserClick }) {
       {activeTab === 'posts' && (
         <div>
           <h3>Gönderiler ({profile.posts?.length ?? 0})</h3>
-      <div className="posts-grid">
+          <div className="posts-grid">
             {(profile.posts || []).map((post) => (
-          <div key={post.id} className="post-card">
-            {post.mediaUrl && (
-              <img
-                src={`http://localhost:5280${post.mediaUrl}`}
-                alt={post.caption}
-                className="post-image"
-              />
-            )}
-            {post.caption && <div className="post-caption">{post.caption}</div>}
-            <div className="post-stats">
-              ❤️ {post.likesCount} • 💬 {post.commentsCount}
-            </div>
+              <div
+                key={post.id}
+                className="post-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedPost(post)}
+              >
+                {post.mediaUrl && (
+                  <img
+                    src={`http://localhost:5280${post.mediaUrl}`}
+                    alt={post.caption}
+                    className="post-image"
+                  />
+                )}
+                {post.caption && <div className="post-caption">{post.caption}</div>}
+                <div className="post-stats">
+                  ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
         </div>
       )}
 
@@ -433,7 +449,12 @@ export default function Profile({ userId, currentUserId, onUserClick }) {
           <h3>Beğenilen Gönderiler ({likedPosts.length})</h3>
           <div className="posts-grid">
             {likedPosts.map((post) => (
-              <div key={post.id} className="post-card">
+              <div
+                key={post.id}
+                className="post-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedPost(post)}
+              >
                 {post.mediaUrl && (
                   <img
                     src={`http://localhost:5280${post.mediaUrl}`}
@@ -454,6 +475,18 @@ export default function Profile({ userId, currentUserId, onUserClick }) {
             ))}
           </div>
         </div>
+      )}
+
+      {selectedPost && (
+        <PostDetailModal
+          post={selectedPost}
+          user={{ id: currentUserId }}
+          onClose={() => setSelectedPost(null)}
+          onUserClick={onUserClick}
+          onLike={(postId, isLiked) => {
+            // Opsiyonel güncellemeler
+          }}
+        />
       )}
     </div>
   );
