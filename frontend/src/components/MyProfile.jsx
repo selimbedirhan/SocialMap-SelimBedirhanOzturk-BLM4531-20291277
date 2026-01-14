@@ -10,6 +10,7 @@ export default function MyProfile({ user, onUserClick }) {
   const [following, setFollowing] = useState([]);
   const [comments, setComments] = useState([]);
   const [likedPosts, setLikedPosts] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -25,6 +26,7 @@ export default function MyProfile({ user, onUserClick }) {
       loadFollowing();
       loadComments();
       loadLikedPosts();
+      loadSavedPosts();
     }
   }, [user]);
 
@@ -77,6 +79,15 @@ export default function MyProfile({ user, onUserClick }) {
       setLikedPosts(posts.filter(p => p !== null));
     } catch (err) {
       console.error('Beğenilen gönderiler yüklenemedi:', err);
+    }
+  };
+
+  const loadSavedPosts = async () => {
+    try {
+      const data = await api.getSavedPosts(user.id);
+      setSavedPosts(data || []);
+    } catch (err) {
+      console.error('Kaydedilen gönderiler yüklenemedi:', err);
     }
   };
 
@@ -621,48 +632,91 @@ export default function MyProfile({ user, onUserClick }) {
         <button
           className={`btn ${activeTab === 'posts' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('posts')}
+          style={{ flex: 1 }}
         >
-          Gönderiler
+          📸 Gönderilerim ({profile.posts?.length ?? 0})
         </button>
         <button
-          className={`btn ${activeTab === 'comments' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveTab('comments')}
+          className={`btn ${activeTab === 'saved' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('saved')}
+          style={{ flex: 1 }}
         >
-          Yorumlar
-        </button>
-        <button
-          className={`btn ${activeTab === 'likes' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveTab('likes')}
-        >
-          Beğeniler
+          📌 Kaydedilenler ({savedPosts.length})
         </button>
       </div>
 
       {activeTab === 'posts' && (
         <div>
-          <h3>Gönderiler ({profile.posts?.length ?? 0})</h3>
-          <div className="posts-grid">
-            {(profile.posts || []).map((post) => (
-              <div
-                key={post.id}
-                className="post-card"
-                style={{ cursor: 'pointer' }}
-                onClick={() => setSelectedPost(post)}
-              >
-                {post.mediaUrl && (
-                  <img
-                    src={`http://localhost:5280${post.mediaUrl}`}
-                    alt={post.caption}
-                    className="post-image"
-                  />
-                )}
-                {post.caption && <div className="post-caption">{post.caption}</div>}
-                <div className="post-stats">
-                  ❤️ {post.likesCount} • 💬 {post.commentsCount}
+          <h3>Gönderilerim</h3>
+          {(profile.posts || []).length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#7f8c8d' }}>
+              Henüz gönderi paylaşmadınız.
+            </div>
+          ) : (
+            <div className="posts-grid">
+              {(profile.posts || []).map((post) => (
+                <div
+                  key={post.id}
+                  className="post-card"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedPost(post)}
+                >
+                  {post.mediaUrl && (
+                    <img
+                      src={`http://localhost:5280${post.mediaUrl}`}
+                      alt={post.caption}
+                      className="post-image"
+                    />
+                  )}
+                  {post.caption && <div className="post-caption">{post.caption}</div>}
+                  <div className="post-stats">
+                    ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'saved' && (
+        <div>
+          <h3>Kaydedilen Gönderiler</h3>
+          {savedPosts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#7f8c8d' }}>
+              Henüz gönderi kaydetmediniz. <br />
+              Anasayfadan beğendiğiniz gönderileri 🔖 butonuyla kaydedebilirsiniz.
+            </div>
+          ) : (
+            <div className="posts-grid">
+              {savedPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="post-card"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedPost(post)}
+                >
+                  {post.mediaUrl && (
+                    <img
+                      src={post.mediaUrl.startsWith('http') ? post.mediaUrl : `http://localhost:5280${post.mediaUrl}`}
+                      alt={post.caption}
+                      className="post-image"
+                    />
+                  )}
+                  {post.caption && <div className="post-caption">{post.caption}</div>}
+                  <div className="post-place" style={{ fontSize: '12px', color: '#3498db', marginTop: '5px' }}>
+                    📍 {post.placeLocation || post.placeName}
+                  </div>
+                  <div className="post-stats">
+                    ❤️ {post.likesCount} • 💬 {post.commentsCount}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#7f8c8d', marginTop: '5px' }}>
+                    @{post.username}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

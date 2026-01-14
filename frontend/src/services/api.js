@@ -356,5 +356,36 @@ export const api = {
     if (!response.ok) throw new Error('Registration failed');
     return response.json();
   },
+
+  // SavedPosts (Kaydedilen Gönderiler)
+  async savePost(userId, postId) {
+    const response = await fetch(`${API_BASE_URL}/savedposts`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ userId, postId }),
+    });
+    if (!response.ok) throw new Error('Failed to save post');
+    return response.json();
+  },
+
+  async unsavePost(userId, postId) {
+    const response = await fetch(`${API_BASE_URL}/savedposts?userId=${userId}&postId=${postId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return response.status === 200 || response.status === 204;
+  },
+
+  async isSaved(userId, postId) {
+    const response = await fetch(`${API_BASE_URL}/savedposts/check?userId=${userId}&postId=${postId}`);
+    if (!response.ok) return false;
+    return response.json();
+  },
+
+  async getSavedPosts(userId) {
+    const response = await fetch(`${API_BASE_URL}/savedposts/user/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch saved posts');
+    return response.json();
+  },
 };
 

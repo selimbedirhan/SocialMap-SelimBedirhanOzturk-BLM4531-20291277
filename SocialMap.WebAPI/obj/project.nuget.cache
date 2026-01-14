@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "9WMCWqyzL4Q=",
+  "dgSpecHash": "P4hpBU8H99A=",
   "success": true,
   "projectFilePath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/SocialMap.WebAPI.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "/Users/selimbedirhanozturk/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
+    "/Users/selimbedirhanozturk/.nuget/packages/cloudinarydotnet/1.27.9/cloudinarydotnet.1.27.9.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/fluentvalidation/12.1.1/fluentvalidation.12.1.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/fluentvalidation.aspnetcore/11.3.1/fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/fluentvalidation.dependencyinjectionextensions/12.1.1/fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
@@ -29,7 +30,7 @@
     "/Users/selimbedirhanozturk/.nuget/packages/microsoft.identitymodel.protocols.openidconnect/8.0.1/microsoft.identitymodel.protocols.openidconnect.8.0.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
-    "/Users/selimbedirhanozturk/.nuget/packages/newtonsoft.json/13.0.2/newtonsoft.json.13.0.2.nupkg.sha512",
+    "/Users/selimbedirhanozturk/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/npgsql/9.0.2/npgsql.9.0.2.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.2/npgsql.entityframeworkcore.postgresql.9.0.2.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/serilog/4.3.0/serilog.4.3.0.nupkg.sha512",

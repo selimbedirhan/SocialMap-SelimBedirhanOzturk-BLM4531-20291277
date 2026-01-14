@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SocialMap.Repository")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+59eb0313148c0cefdc384353c43c1ea7bcc0d88d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6f25fb5d781a95ee876d6b0aba0323d592f657a8")]
 [assembly: System.Reflection.AssemblyProductAttribute("SocialMap.Repository")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SocialMap.Repository")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

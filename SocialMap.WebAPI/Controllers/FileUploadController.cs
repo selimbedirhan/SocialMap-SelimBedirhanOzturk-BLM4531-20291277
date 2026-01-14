@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using SocialMap.Business.Services;
+using SocialMap.Core.Interfaces;
 
 namespace SocialMap.WebAPI.Controllers;
 
@@ -7,11 +9,18 @@ namespace SocialMap.WebAPI.Controllers;
 public class FileUploadController : ControllerBase
 {
     private readonly IWebHostEnvironment _environment;
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly ILogger<FileUploadController> _logger;
     private const string UploadFolder = "uploads";
 
-    public FileUploadController(IWebHostEnvironment environment)
+    public FileUploadController(
+        IWebHostEnvironment environment, 
+        IBlobStorageService blobStorageService,
+        ILogger<FileUploadController> logger)
     {
         _environment = environment;
+        _blobStorageService = blobStorageService;
+        _logger = logger;
     }
 
     [HttpPost("image")]
@@ -31,29 +40,61 @@ public class FileUploadController : ControllerBase
         if (file.Length > 5 * 1024 * 1024)
             return BadRequest("Dosya boyutu 5MB'dan büyük olamaz.");
 
-        // Upload klasörünü oluştur
+        // Benzersiz dosya adı oluştur
+        var fileName = $"{Guid.NewGuid()}{fileExtension}";
+        
+        // Cloudinary yapılandırılmışsa Cloudinary'e yükle
+        if (_blobStorageService is CloudinaryStorageService cloudinaryService && cloudinaryService.IsConfigured)
+        {
+            try
+            {
+                using var stream = file.OpenReadStream();
+                var cloudinaryUrl = await _blobStorageService.UploadAsync(stream, fileName, file.ContentType);
+                _logger.LogInformation("File uploaded to Cloudinary: {Url}", cloudinaryUrl);
+                return Ok(new { url = cloudinaryUrl });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Cloudinary upload failed, falling back to local storage");
+                // Cloudinary yüklemesi başarısız olursa local storage'a düş
+            }
+        }
+
+        // Local storage'a yükle (fallback)
         var uploadPath = Path.Combine(_environment.ContentRootPath, UploadFolder);
         if (!Directory.Exists(uploadPath))
             Directory.CreateDirectory(uploadPath);
 
-        // Benzersiz dosya adı oluştur
-        var fileName = $"{Guid.NewGuid()}{fileExtension}";
         var filePath = Path.Combine(uploadPath, fileName);
 
-        // Dosyayı kaydet
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        // URL döndür
         var fileUrl = $"/{UploadFolder}/{fileName}";
+        _logger.LogInformation("File uploaded to local storage: {Url}", fileUrl);
         return Ok(new { url = fileUrl });
     }
 
     [HttpDelete("image/{fileName}")]
-    public IActionResult DeleteImage(string fileName)
+    public async Task<IActionResult> DeleteImage(string fileName)
     {
+        // Cloudinary'den silmeyi dene
+        if (_blobStorageService is CloudinaryStorageService cloudinaryService && cloudinaryService.IsConfigured)
+        {
+            try
+            {
+                await _blobStorageService.DeleteAsync(fileName);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Cloudinary delete failed, trying local storage");
+            }
+        }
+
+        // Local storage'dan sil
         var uploadPath = Path.Combine(_environment.ContentRootPath, UploadFolder, fileName);
         
         if (System.IO.File.Exists(uploadPath))
@@ -65,4 +106,3 @@ public class FileUploadController : ControllerBase
         return NotFound();
     }
 }
-

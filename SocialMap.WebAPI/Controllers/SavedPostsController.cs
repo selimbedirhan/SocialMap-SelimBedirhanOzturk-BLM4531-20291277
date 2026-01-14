@@ -33,12 +33,44 @@ public class SavedPostsController : ControllerBase
     /// Kullanıcının kayıtlı gönderilerini getir
     /// </summary>
     [HttpGet("user/{userId}")]
+    [AllowAnonymous] // Profil görüntülemek için auth gerekmesin
     public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetSavedPosts(Guid userId)
     {
         var savedPosts = await _savedPostRepository.GetByUserIdAsync(userId);
-        var posts = savedPosts.Select(sp => sp.Post).Where(p => p != null);
-        var postDtos = _mapper.Map<IEnumerable<PostResponseDto>>(posts);
+        
+        var postDtos = savedPosts
+            .Where(sp => sp.Post != null)
+            .Select(sp => new PostResponseDto
+            {
+                Id = sp.Post!.Id,
+                UserId = sp.Post.UserId,
+                Username = sp.Post.User?.Username ?? "Bilinmiyor",
+                UserProfilePhotoUrl = sp.Post.User?.ProfilePhotoUrl,
+                PlaceId = sp.Post.PlaceId,
+                PlaceName = sp.Post.PlaceName ?? sp.Post.Place?.Name ?? "",
+                PlaceLocation = BuildPlaceLocation(sp.Post),
+                Latitude = sp.Post.Latitude,
+                Longitude = sp.Post.Longitude,
+                MediaUrl = sp.Post.MediaUrl,
+                Caption = sp.Post.Caption,
+                LikesCount = sp.Post.LikesCount,
+                CommentsCount = sp.Post.CommentsCount,
+                CreatedAt = sp.Post.CreatedAt,
+                Comments = new List<CommentResponseDto>(), // Boş bırak - circular ref önleme
+                Likes = new List<LikeResponseDto>()
+            })
+            .ToList();
+            
         return Ok(postDtos);
+    }
+    
+    private static string BuildPlaceLocation(Post post)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrEmpty(post.PlaceName)) parts.Add(post.PlaceName);
+        if (!string.IsNullOrEmpty(post.City)) parts.Add(post.City);
+        if (!string.IsNullOrEmpty(post.Country)) parts.Add(post.Country);
+        return parts.Count > 0 ? string.Join(" - ", parts) : "Konum belirtilmemiş";
     }
 
     /// <summary>

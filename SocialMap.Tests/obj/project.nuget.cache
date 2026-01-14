@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "XCnhGl6Rn54=",
+  "dgSpecHash": "wiIGQ6Md11s=",
   "success": true,
   "projectFilePath": "/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.Tests/SocialMap.Tests.csproj",
   "expectedPackageFiles": [
     "/Users/selimbedirhanozturk/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
+    "/Users/selimbedirhanozturk/.nuget/packages/cloudinarydotnet/1.27.9/cloudinarydotnet.1.27.9.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/coverlet.collector/6.0.4/coverlet.collector.6.0.4.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/fluentassertions/7.0.0/fluentassertions.7.0.0.nupkg.sha512",
     "/Users/selimbedirhanozturk/.nuget/packages/fluentvalidation/12.1.1/fluentvalidation.12.1.1.nupkg.sha512",

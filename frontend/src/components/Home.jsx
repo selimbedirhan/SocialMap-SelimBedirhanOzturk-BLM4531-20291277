@@ -188,6 +188,7 @@ export default function Home({ user, onUserClick }) {
 
 function PostCard({ post, user, onLike, onUserClick }) {
   const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -195,6 +196,7 @@ function PostCard({ post, user, onLike, onUserClick }) {
   useEffect(() => {
     if (user?.id) {
       checkLikeStatus();
+      checkSaveStatus();
       loadComments();
     }
   }, [post.id, user?.id]);
@@ -205,6 +207,15 @@ function PostCard({ post, user, onLike, onUserClick }) {
       setIsLiked(liked);
     } catch (err) {
       console.error('Like durumu kontrol edilemedi:', err);
+    }
+  };
+
+  const checkSaveStatus = async () => {
+    try {
+      const saved = await api.isSaved(user.id, post.id);
+      setIsSaved(saved);
+    } catch (err) {
+      console.error('Save durumu kontrol edilemedi:', err);
     }
   };
 
@@ -220,6 +231,20 @@ function PostCard({ post, user, onLike, onUserClick }) {
   const handleLike = () => {
     onLike(post.id);
     setIsLiked(!isLiked);
+  };
+
+  const handleSave = async () => {
+    if (!user?.id) return;
+    try {
+      if (isSaved) {
+        await api.unsavePost(user.id, post.id);
+      } else {
+        await api.savePost(user.id, post.id);
+      }
+      setIsSaved(!isSaved);
+    } catch (err) {
+      console.error('Save işlemi hatası:', err);
+    }
   };
 
   const handleAddComment = async (e) => {
@@ -265,16 +290,34 @@ function PostCard({ post, user, onLike, onUserClick }) {
         </div>
       )}
       {post.caption && <div className="post-caption">{post.caption}</div>}
-      <div className="post-actions">
+      <div className="post-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            className={`like-btn ${isLiked ? 'liked' : ''}`}
+            onClick={handleLike}
+          >
+            {isLiked ? '❤️' : '🤍'}
+          </button>
+          <span className="post-stats">
+            {post.likesCount} beğeni • {post.commentsCount} yorum
+          </span>
+        </div>
         <button
-          className={`like-btn ${isLiked ? 'liked' : ''}`}
-          onClick={handleLike}
+          onClick={handleSave}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            padding: '5px',
+            transition: 'transform 0.2s ease'
+          }}
+          title={isSaved ? 'Kayıtlardan çıkar' : 'Kaydet'}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          {isLiked ? '❤️' : '🤍'}
+          {isSaved ? '📌' : '🔖'}
         </button>
-        <span className="post-stats">
-          {post.likesCount} beğeni • {post.commentsCount} yorum
-        </span>
       </div>
       <button
         className="btn btn-secondary"

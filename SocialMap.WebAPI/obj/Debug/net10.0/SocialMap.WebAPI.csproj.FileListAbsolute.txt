@@ -132,3 +132,11 @@
 /Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Serilog.Sinks.Debug.dll
 /Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Serilog.Sinks.File.dll
 /Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/HealthChecks.NpgSql.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Azure.Core.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Azure.Storage.Blobs.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Azure.Storage.Common.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/Microsoft.Bcl.AsyncInterfaces.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/System.ClientModel.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/System.IO.Hashing.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/System.Memory.Data.dll
+/Users/selimbedirhanozturk/Documents/SocialMap/SocialMap.WebAPI/bin/Debug/net10.0/CloudinaryDotNet.dll

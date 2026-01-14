@@ -218,6 +218,7 @@ builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddSingleton<IBlobStorageService, CloudinaryStorageService>();
 builder.Services.AddScoped<PostGeohashUpdateService>();
 builder.Services.AddScoped<NotificationBroadcaster>();
 
