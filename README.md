@@ -2,8 +2,6 @@
 
 **SocialMap**, konum tabanlı, modern ve interaktif bir sosyal medya platformudur. Kullanıcıların anılarını harita üzerinde ölümsüzleştirmesine, dünyayı keşfetmesine ve diğer kullanıcılarla etkileşime girmesine olanak tanır. Instagram benzeri kullanıcı deneyimini, gelişmiş harita özellikleriyle birleştirir.
 
-![SocialMap Banner](https://via.placeholder.com/1200x400.png?text=SocialMap+Project)
-
 ## 🌟 Proje Durumu
 
 Bu proje aşağıdaki fazları başarıyla tamamlamıştır:
