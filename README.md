@@ -2,6 +2,14 @@
 
 **SocialMap**, konum tabanlı, modern ve interaktif bir sosyal medya platformudur. Kullanıcıların anılarını harita üzerinde ölümsüzleştirmesine, dünyayı keşfetmesine ve diğer kullanıcılarla etkileşime girmesine olanak tanır. Instagram benzeri kullanıcı deneyimini, gelişmiş harita özellikleriyle birleştirir.
 
+## 🎥 Sunum Videosu
+
+Projenin detaylı teknik sunumu ve gösterimi için:
+
+📺 **[Sunum Videosunu İzle](https://drive.google.com/drive/folders/1xSkRGJot9uOrNhnBkKfwSVsoUJxKomY7?usp=sharing)**
+
+---
+
 ## 🌟 Proje Durumu
 
 Bu proje aşağıdaki fazları başarıyla tamamlamıştır:
@@ -161,9 +169,4 @@ Backend çalıştığında Swagger arayüzü üzerinden tüm endpoint'leri test 
 
 ---
 
-## 📝 Lisans
-
-Bu proje MIT lisansı altındadır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
-
----
 **Geliştirici**: Selim Bedirhan Öztürk
